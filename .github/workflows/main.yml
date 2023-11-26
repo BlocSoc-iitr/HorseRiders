@@ -23,7 +23,7 @@ jobs:
       - name: Check compatibility with latest
         if: always()
         run: |
-          output=$(forge build --skip test)
+          output=$(forge build --via-ir --skip test)
 
           if echo "$output" | grep -q "Warning"; then
             echo "$output"
@@ -44,7 +44,7 @@ jobs:
         run: forge --version
 
       - name: Run tests
-        run: forge test -vvv
+        run: forge test --via-ir -vvv
 
   fmt:
     runs-on: ubuntu-latest
