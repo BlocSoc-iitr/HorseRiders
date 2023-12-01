@@ -12,7 +12,6 @@ out/
 # Vscode
 .vscode/
 
-lib/
 
 # huffc artifacts
 artifacts
