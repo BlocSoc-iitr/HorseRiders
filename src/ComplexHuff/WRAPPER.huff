@@ -1,6 +1,6 @@
 #include './Complex.huff'
 
-#define function subz(int256,int256,int256,int256) view returns y(int256,int256)
+#define function subz(int256,int256,int256,int256) view returns (int256,int256)
 #define function addz(int256,int256,int256,int256) view returns (int256,int256)
 #define function mulz(int256,int256,int256,int256) view returns (int256,int256)
 #define function divz(int256,int256,int256,int256) view returns (int256,int256)
