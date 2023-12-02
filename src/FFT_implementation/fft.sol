@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
 import "./trig.sol";
 
 contract FFT {
@@ -10,7 +11,7 @@ contract FFT {
 
     uint256 PI = 3141592653589793238; // PI * 1e18
 
-    struct complex{
+    struct complex {
         int256 real;
         int256 img;
     }
@@ -24,23 +25,23 @@ contract FFT {
         return log_val;
     }
 
-    function fft(
-        int[4] memory real_part,
-        int[4] memory complex_part
-    ) public view returns (int[4] memory, int[4] memory) {
+    function fft(int256[4] memory real_part, int256[4] memory complex_part)
+        public
+        view
+        returns (int256[4] memory, int256[4] memory)
+    {
         uint256 N = real_part.length;
         uint256 k = N;
         uint256 n;
         uint256 thetaT = (PI / N);
-        complex memory phiT=complex(Trigonometry.cos(thetaT),-Trigonometry.sin(thetaT));
-       
+        complex memory phiT = complex(Trigonometry.cos(thetaT), -Trigonometry.sin(thetaT));
+
         complex memory T;
         while (k > 1) {
             n = k;
             k >>= 1;
             int256 phiT_real__temp = phiT.real;
-            phiT.real = (((phiT.real * phiT.real) / 1e18) -
-                ((phiT.img * phiT.img) / 1e18));
+            phiT.real = (((phiT.real * phiT.real) / 1e18) - ((phiT.img * phiT.img) / 1e18));
             phiT.img = (2 * phiT.img * phiT_real__temp) / 1e18;
             if (k == 2) require(phiT.real / 1e12 == 0);
             T.real = 1 * 1e18;
@@ -48,22 +49,18 @@ contract FFT {
             for (uint256 l = 0; l < k; l++) {
                 for (uint256 a = l; a < N; a += n) {
                     uint256 b = a + k;
-                
+
                     complex memory t;
                     t.real = real_part[a] - real_part[b];
                     t.img = complex_part[a] - complex_part[b];
                     real_part[a] = real_part[a] + real_part[b];
                     complex_part[a] = complex_part[a] + complex_part[b];
-                    real_part[b] = (((T.real * t.real) / 1e18) -
-                        ((T.img * t.img) / 1e18));
-                    complex_part[b] = (((T.real * t.img) / 1e18) +
-                        ((T.img * t.real) / 1e18));
+                    real_part[b] = (((T.real * t.real) / 1e18) - ((T.img * t.img) / 1e18));
+                    complex_part[b] = (((T.real * t.img) / 1e18) + ((T.img * t.real) / 1e18));
                 }
                 int256 T_real_temp = T.real;
-                T.real = (((T.real * phiT.real) / 1e18) -
-                    ((T.img * phiT.img) / 1e18));
-                T.img = (((T_real_temp * phiT.img) / 1e18) +
-                    ((T.img * phiT.real) / 1e18));
+                T.real = (((T.real * phiT.real) / 1e18) - ((T.img * phiT.img) / 1e18));
+                T.img = (((T_real_temp * phiT.img) / 1e18) + ((T.img * phiT.real) / 1e18));
             }
         }
 
