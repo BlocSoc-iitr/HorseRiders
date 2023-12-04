@@ -9,15 +9,20 @@ contract FFTTest is Test {
     FFT public fft;
     int256[] real_part;
     int256[] complex_part;
-    
+
     function setUp() public {
         fft = new FFT();
     }
 
     function test_finalFFT1() public {
-       
-        real_part.push((int256(1) * 1e18));real_part.push( -1 * 1e18);real_part.push( 0 * 1e18); real_part.push( 0 * 1e18);
-        complex_part.push(int256(0) * 1e18); complex_part.push(0 * 1e18);complex_part.push( 1 * 1e18);complex_part.push( -1 * 1e18);
+        real_part.push((int256(1) * 1e18));
+        real_part.push(-1 * 1e18);
+        real_part.push(0 * 1e18);
+        real_part.push(0 * 1e18);
+        complex_part.push(int256(0) * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(1 * 1e18);
+        complex_part.push(-1 * 1e18);
         int256[] memory re;
         int256[] memory im;
         (re, im) = fft.fft(real_part, complex_part);
@@ -33,12 +38,24 @@ contract FFTTest is Test {
         // complex_part=[];
     }
 
-    function test_finalFFT2() public{
-        real_part.push(1 * 1e18);real_part.push( -1 * 1e18);real_part.push( 0 * 1e18); real_part.push( 0 * 1e18);
-        real_part.push(1* 1e18);real_part.push( 2* 1e18);real_part.push( 3* 1e18);real_part.push( 2* 1e18);
-        complex_part.push(0 * 1e18); complex_part.push(0 * 1e18);complex_part.push( 1 * 1e18);complex_part.push( -1 * 1e18);
-        complex_part.push(0* 1e18);complex_part.push(1* 1e18);complex_part.push(3* 1e18);complex_part.push(0* 1e18);
-        assertEq(real_part.length,8);
+    function test_finalFFT2() public {
+        real_part.push(1 * 1e18);
+        real_part.push(-1 * 1e18);
+        real_part.push(0 * 1e18);
+        real_part.push(0 * 1e18);
+        real_part.push(1 * 1e18);
+        real_part.push(2 * 1e18);
+        real_part.push(3 * 1e18);
+        real_part.push(2 * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(1 * 1e18);
+        complex_part.push(-1 * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(1 * 1e18);
+        complex_part.push(3 * 1e18);
+        complex_part.push(0 * 1e18);
+        assertEq(real_part.length, 8);
         int256[] memory re;
         int256[] memory im;
         (re, im) = fft.fft(real_part, complex_part);
@@ -50,14 +67,14 @@ contract FFTTest is Test {
         assertApproxEqAbs(im[2], -3 * 1e18, 1e15);
         assertApproxEqAbs(re[3], 1.292 * 1e18, 1e15);
         assertApproxEqAbs(im[3], 0.535 * 1e18, 1e15);
-        assertApproxEqAbs(re[4], 2* 1e18, 1e15);
+        assertApproxEqAbs(re[4], 2 * 1e18, 1e15);
         assertApproxEqAbs(im[4], 4 * 1e18, 1e15);
         assertApproxEqAbs(re[5], 0.1213 * 1e18, 1e15);
         assertApproxEqAbs(im[5], -0.5355 * 1e18, 1e15);
         assertApproxEqAbs(re[6], -3 * 1e18, 1e15);
         assertApproxEqAbs(im[6], -5 * 1e18, 1e15);
         assertApproxEqAbs(re[7], 2.7071 * 1e18, 1e15);
-        assertApproxEqAbs(im[7], -6.5355* 1e18, 1e15);
+        assertApproxEqAbs(im[7], -6.5355 * 1e18, 1e15);
     }
     // // function test_trig() public {
     // //     int sinVal = Trigonometry.sin(15707963267948966150);
