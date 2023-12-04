@@ -49,7 +49,7 @@ contract ComplexTest is Test {
     }
 
     function testFromPolar() public {
-        (int r, int i) = complex.fromPolar(5 * scale, 92729522 * 1e10);
+        (int256 r, int256 i) = complex.fromPolar(5 * scale, 92729522 * 1e10);
         assertApproxEqAbs(r, 3 * scale, 1e15);
         assertApproxEqAbs(i, 4 * scale, 1e15);
     }
