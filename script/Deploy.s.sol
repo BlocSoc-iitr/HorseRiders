@@ -12,8 +12,7 @@ interface WRAPPER {
     function calcR(int256, int256) external returns (uint256);
 
     function toPolar(int256, int256) external returns (int256, int256);
-
-    //   function fromPolar(int256, int256) external returns (int256, int256);
+    function fromPolar(int256, int256) external returns (int256, int256);
 
     //   function p_atan2(int256, int256) external returns (int256);
 

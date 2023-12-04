@@ -48,17 +48,11 @@ contract ComplexTest is Test {
         assertEq((t * 100) / scale, 92);
     }
 
-    // function testToPolar() public {
-    //     (int r, int t) = complex.toPolar(3 * scale, 4 * scale);
-    //     assertEq(r / scale, 5); // r = 5
-    //     assertEq((t * 100) / scale, 92); // T = arctan(4/3) == 0.92 rad
-    // }
-
-    // function testFromPolar() public {
-    //     (int r, int i) = complex.fromPolar(5 * scale, 92729522 * 1e10);
-    //     assertApproxEqAbs(r, 3 * scale, 1e15);
-    //     assertApproxEqAbs(i, 4 * scale, 1e15);
-    // }
+    function testFromPolar() public {
+        (int256 r, int256 i) = complex.fromPolar(5 * scale, 92729522 * 1e10);
+        assertApproxEqAbs(r, 3 * scale, 1e15);
+        assertApproxEqAbs(i, 4 * scale, 1e15);
+    }
 }
 
 interface WRAPPER {
@@ -74,7 +68,7 @@ interface WRAPPER {
 
     function toPolar(int256, int256) external returns (int256, int256);
 
-    // function fromPolar(int256, int256) external returns (int256, int256);
+    function fromPolar(int256, int256) external returns (int256, int256);
 
     // function p_atan2(int256, int256) external returns (int256);
 
