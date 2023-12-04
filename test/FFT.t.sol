@@ -13,20 +13,10 @@ contract FFTTest is Test {
     }
 
     function test_finalFFT() public {
-        int[4] memory real_part = [
-            int(1) * 1e18,
-            -1 * 1e18,
-            0 * 1e18,
-            0 * 1e18
-        ];
-        int[4] memory complex_part = [
-            int(0) * 1e18,
-            0 * 1e18,
-            1 * 1e18,
-            -1 * 1e18
-        ];
-        int[4] memory re;
-        int[4] memory im;
+        int256[4] memory real_part = [int256(1) * 1e18, -1 * 1e18, 0 * 1e18, 0 * 1e18];
+        int256[4] memory complex_part = [int256(0) * 1e18, 0 * 1e18, 1 * 1e18, -1 * 1e18];
+        int256[4] memory re;
+        int256[4] memory im;
         (re, im) = fft.fft(real_part, complex_part);
         assertApproxEqAbs(re[0], 0 * 1e18, 1e15);
         assertApproxEqAbs(im[0], 0 * 1e18, 1e15);
