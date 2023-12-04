@@ -1,7 +1,7 @@
 #include './Constants.huff'
 // #include './Helper.huff'
 // #include './PRBMath'
-// #include './Trigonometry.Huff'
+#include './Trigonometry.huff'
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
 
@@ -262,11 +262,15 @@
     jumpi
     dup2             // [r,T,r]
     dup2             // [T,r,T,r]
-    PUT_NEG1()       // [-1,T,r,T,r]
+    0x01
+    0x00
+    sub              // [-1,T,r,T,r]
     mul              // [-1T,r,T,r]
     SIN()            // [sin(-T),r,T,r]
     mul              // [sin(-T)*r,T,r]
-    PUT_NEG1()       // [-1,sin(-T)*r,T,r]
+    0x01
+    0x00
+    sub              // [-1,sin(-T)*r,T,r]
     mul              // [-sin(-T)*r,T,r]
     [X3]             // [1e18,-sin(-T)*r,T,r]
     swap1            // [-sin(-T)*r,1e18,T,r]
@@ -279,6 +283,9 @@
     [X3]             // [1e18,r*cos(T),-sin(-T)*r/1e18]
     swap1            // [r*cos(T),1e18,-sin(-T)*r/1e18]]
     sdiv             // [r*cos(T),1e18,-sin(-T)*r/1e18]
+    0x00 mstore
+    0x20 mstore
+    0x40 0x00 return
 
     case2:           // T is positive
     dup2             // [r,T,r]
@@ -295,7 +302,10 @@
     mul              // [r*cos(T),sin(T)*r/1e18]
     [X3]             // [1e18,r*cos(T),sin(T)*r/1e18]
     swap1            // [r*cos(T),1e18,sin(T)*r/1e18]]
-    sdiv             // [r*cos(T),1e18,sin(T)*r/1e18]
+    sdiv             // [r*cos(T)/1e18,sin(T)*r/1e18]
+    0x00 mstore
+    0x20 mstore
+    0x40 0x00 return
 }
 
 // #define macro P_ATAN2() = takes(2) returns(1) {
