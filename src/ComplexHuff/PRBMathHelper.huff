@@ -1,5 +1,5 @@
 #include './Constants.huff
-#include './Helper.Huff'
+#include './Helper.huff'
 
 #define macro GATE1() = takes(0) returns(0) {
     //Input Stack [result,xn,x] 
