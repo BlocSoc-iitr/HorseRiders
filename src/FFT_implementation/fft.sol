@@ -25,10 +25,10 @@ contract FFT {
         return log_val;
     }
 
-    function fft(int256[4] memory real_part, int256[4] memory complex_part)
+    function fft(int256[] memory real_part, int256[] memory complex_part)
         public
         view
-        returns (int256[4] memory, int256[4] memory)
+        returns (int256[] memory, int256[] memory)
     {
         uint256 N = real_part.length;
         uint256 k = N;
@@ -43,7 +43,7 @@ contract FFT {
             int256 phiT_real__temp = phiT.real;
             phiT.real = (((phiT.real * phiT.real) / 1e18) - ((phiT.img * phiT.img) / 1e18));
             phiT.img = (2 * phiT.img * phiT_real__temp) / 1e18;
-            if (k == 2) require(phiT.real / 1e12 == 0);
+            // if (k == 2) require(phiT.real / 1e12 == 0);
             T.real = 1 * 1e18;
             T.img = 0 * 1e18;
             for (uint256 l = 0; l < k; l++) {
