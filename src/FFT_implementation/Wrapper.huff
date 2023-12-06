@@ -1,0 +1,34 @@
+#include './FFT.huff'
+
+#define function fft(int256[] memory, int256[] memory) view returns (int256[] memory, int256[] memory)
+
+// #define macro FFT()=takes (0) returns (0){}
+
+#define macro FFT_LOCAL() = takes(0) returns (0){
+    0x1a0 mload            //[im[3]]
+    0x100 mload            //[re[3],im[3]]
+    0x180 mload            //[im[2],re[3],im[3]]
+    0xe0 mload              //[re[2],im[2],re[3],im[3]]  
+    0x160 mload            //[im[1],re[2],im[2],re[3],im[3]]  
+    0xc0 mload              //[re[1],im[1],re[2],im[2],re[3],im[3]]     
+    0x140 mload             //[im[0],re[1],im[1],re[2],im[2],re[3],im[3]]   
+    0xa0 mload              //[re[0],im[0],re[1],im[1],re[2],im[2],re[3],im[3]]
+    0x00 mstore             //[im[0],re[1],im[1],re[2],im[2],re[3],im[3]]
+    0x20 mstore             //[re[1],im[1],re[2],im[2],re[3],im[3]]
+    0x40 mstore             //[im[1],re[2],im[2],re[3],im[3]]
+    0x60 mstore             //[re[2],im[2],re[3],im[3]]
+    0x80 mstore             //[im[2],re[3],im[3]]
+    0xa0 mstore             //[re[3],im[3]]
+    0xc0 mstore             //[im[3]]
+    0xe0 mstore             //[]
+    FFT()
+}
+
+#define macro MAIN()= takes (0) returns (0){
+    0x00 calldataload 0xE0 shr
+    __FUNC_SIG(fft) eq fft jumpi
+    0x00 0x00 revert
+
+    fft:
+    FFT_LOCAL()
+}
