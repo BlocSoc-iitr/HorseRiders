@@ -1,5 +1,5 @@
 #include './Constants.huff'
-// #include './Helper.huff'
+#include './Helper.huff'
 // #include './PRBMath'
 #include './Trigonometry.huff'
 

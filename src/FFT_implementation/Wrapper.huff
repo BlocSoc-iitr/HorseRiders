@@ -1,27 +1,59 @@
 #include './FFT.huff'
 
-#define function fft(int256[] memory, int256[] memory) view returns (int256[] memory, int256[] memory)
+#define function fft(int256[4] memory, int256[4] memory) view returns (int256[4] memory, int256[4] memory)
 
 // #define macro FFT()=takes (0) returns (0){}
+///@notice stroing values as desired in the fft implementation
 
-#define macro FFT_LOCAL() = takes(0) returns (0){
-    0x1a0 mload            //[im[3]]
-    0x100 mload            //[re[3],im[3]]
-    0x180 mload            //[im[2],re[3],im[3]]
-    0xe0 mload              //[re[2],im[2],re[3],im[3]]  
-    0x160 mload            //[im[1],re[2],im[2],re[3],im[3]]  
-    0xc0 mload              //[re[1],im[1],re[2],im[2],re[3],im[3]]     
-    0x140 mload             //[im[0],re[1],im[1],re[2],im[2],re[3],im[3]]   
-    0xa0 mload              //[re[0],im[0],re[1],im[1],re[2],im[2],re[3],im[3]]
-    0x00 mstore             //[im[0],re[1],im[1],re[2],im[2],re[3],im[3]]
-    0x20 mstore             //[re[1],im[1],re[2],im[2],re[3],im[3]]
-    0x40 mstore             //[im[1],re[2],im[2],re[3],im[3]]
-    0x60 mstore             //[re[2],im[2],re[3],im[3]]
-    0x80 mstore             //[im[2],re[3],im[3]]
-    0xa0 mstore             //[re[3],im[3]]
-    0xc0 mstore             //[im[3]]
-    0xe0 mstore             //[]
-    FFT()
+// #define macro FFT_LOCAL() = takes(0) returns (0){
+//     0x1a0 mload            //[im[3]]
+//     0x100 mload            //[re[3],im[3]]
+//     0x180 mload            //[im[2],re[3],im[3]]
+//     0xe0 mload              //[re[2],im[2],re[3],im[3]]  
+//     0x160 mload            //[im[1],re[2],im[2],re[3],im[3]]  
+//     0xc0 mload              //[re[1],im[1],re[2],im[2],re[3],im[3]]     
+//     0x140 mload             //[im[0],re[1],im[1],re[2],im[2],re[3],im[3]]   
+//     0xa0 mload              //[re[0],im[0],re[1],im[1],re[2],im[2],re[3],im[3]]
+//     0x00 mstore             //[im[0],re[1],im[1],re[2],im[2],re[3],im[3]]
+//     0x20 mstore             //[re[1],im[1],re[2],im[2],re[3],im[3]]
+//     0x40 mstore             //[im[1],re[2],im[2],re[3],im[3]]
+//     0x60 mstore             //[re[2],im[2],re[3],im[3]]
+//     0x80 mstore             //[im[2],re[3],im[3]]
+//     0xa0 mstore             //[re[3],im[3]]
+//     0xc0 mstore             //[im[3]]
+//     0xe0 mstore             //[]
+//     // FFT()
+//     0xe0 mload
+//     // 0x01 [X3] mul add
+//     0xa0 mload
+//     0x60 mload
+//     0x20 mload
+//     // 0x04
+//     0xc0 mload
+//     0x80 mload
+//     0x40 mload
+//     0x00 mload
+//     // 0x04
+//     0x00 mstore
+//     0x20 mstore
+//     0x40 mstore
+//     0x60 mstore
+//     0x80 mstore
+//     0xa0 mstore
+//     0xc0 mstore
+//     0xe0 mstore
+//     // 0x100 mstore
+//     // 0x120 mstore
+//     0x140 0x00 return
+// }
+#define macro FFT_LOCAL() =takes(0) returns (0){
+    0x80 mload 
+    0x00 
+    [X3] mul
+    eq retu jumpi
+    0x00 0x00 revert
+    retu:
+    0x100 0x00 return 
 }
 
 #define macro MAIN()= takes (0) returns (0){
