@@ -10,9 +10,9 @@ import "forge-std/console.sol";
 contract FFTTest is Test {
     FFT public fft;
     Wrapper public fft_huff;
-    // int256[] real_part;
-    // int256[] complex_part;
-    int256 constant SCALE=1e18;
+    int256[] real_part;
+    int256[] complex_part;
+    int256 constant SCALE = 1e18;
 
     function setUp() public {
         fft = new FFT();
@@ -39,8 +39,6 @@ contract FFTTest is Test {
     //     assertApproxEqAbs(im[2], 2 * 1e18, 1e15);
     //     assertApproxEqAbs(re[3], 0 * 1e18, 1e15);
     //     assertApproxEqAbs(im[3], -2 * 1e18, 1e15);
-    //     // real_part=;
-    //     // complex_part=[];
     // }
 
     // function test_finalFFT2() public {
@@ -82,43 +80,37 @@ contract FFTTest is Test {
     //     assertApproxEqAbs(im[7], -6.5355 * 1e18, 1e15);
     // }
     // function test_trig() public {
-    //     int sinVal = Trigonometry.sin(15707963267948966150);
+    //     int sinVal = Trigonometry.sin(1570796326794896615);
     //     int cosVal = Trigonometry.cos(0);
-    //     assertEq(sinVal, cosVal);
+    //     assertApproxEqAbs(sinVal, cosVal,1e15);
     // }
 
-//     function testfft() public {
-//         real_part.push((11 * 1e18));
-//         real_part.push(12 * 1e18);
-//         real_part.push(13 * 1e18);
-//         real_part.push(14 * 1e18);
-//         complex_part.push(21 * 1e18);
-//         complex_part.push(22 * 1e18);
-//         complex_part.push(23 * 1e18);
-//         complex_part.push(24 * 1e18);
-//         int256[4] memory re;
-//         int256[4] memory im;
-//         (re, im) = fft_huff.fft(real_part, complex_part);
-//         // assertEq(im[1],4);
-//         // assertApproxEqAbs(re[3], 14*1e18, 1e15);
-//         // assertApproxEqAbs(re[2], 13*1e18, 1e15);
-//         // assertApproxEqAbs(re[1], 12*1e18, 1e15);
-//         // assertApproxEqAbs(re[0], 11*1e18, 1e15);
-//         // assertApproxEqAbs(im[3], 24*1e18, 1e15);
-//         // assertApproxEqAbs(im[2], 23*1e18, 1e15);
-//         // assertApproxEqAbs(im[1], 22*1e18, 1e15);
-//         // assertApproxEqAbs(im[0], 21*1e18, 1e15);
-//     }
-function testfft() public{
-    int256[4] memory real_part=[1*SCALE,-1*SCALE,0*SCALE,0*SCALE];
-    int256[4] memory complex_part=[0*SCALE,0*SCALE,1*SCALE,-1*SCALE];
-    int256[4] memory re;
-    int256[4] memory im;
-    (re, im) = fft_huff.fft(real_part, complex_part);        
-    // assertEq(im[1],4);
-}
+    function testfft() public {
+        real_part.push((int256(1) * 1e18));
+        real_part.push(-1 * 1e18);
+        real_part.push(0 * 1e18);
+        real_part.push(0 * 1e18);
+        complex_part.push(int256(0) * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(1 * 1e18);
+        complex_part.push(-1 * 1e18);
+        int256[4] memory re;
+        int256[4] memory im;
+        (re, im) = fft_huff.fft(real_part, complex_part);
+        uint256 a = uint256(re[0]);
+        console.log(a);
+        // assertEq(re[1],4);
+        // assertApproxEqAbs(re[0], 0 * 1e18, 1e15);
+        assertApproxEqAbs(im[0], 0 * 1e18, 1e15);
+        // assertApproxEqAbs(re[1], 2 * 1e18, 1e15);
+        // assertApproxEqAbs(im[1], 0 * 1e18, 1e15);
+        // assertApproxEqAbs(re[2], 2 * 1e18, 1e15);
+        assertApproxEqAbs(im[2], 2 * 1e18, 1e15);
+        // assertApproxEqAbs(re[3], 0 * 1e18, 1e15);
+        // assertApproxEqAbs(im[3], -2 * 1e18, 1e15);
+    }
 }
 
 interface Wrapper {
-    function fft(int256[4] memory, int256[4] memory) external returns (int256[4] memory, int256[4] memory);
+    function fft(int256[] memory, int256[] memory) external returns (int256[4] memory, int256[4] memory);
 }
