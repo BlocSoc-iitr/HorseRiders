@@ -12,8 +12,7 @@
 #define function ln(int256,int256) view returns (int256,int256)
 #define function sqrt(int256,int256) view returns (int256,int256)
 #define function expZ(int256,int256) view returns (int256,int256)
-// #define function pow(int256 , int256 , int256) returns (int256 ,int256)
-
+#define function pow(int256,int256,int256) view returns (int256,int256)
 
 
 #define macro SUB_Z_LOCAL() = takes (0) returns (0) {
@@ -140,15 +139,15 @@
 }
 
 
-// #define macro POW_LOCAL() = takes(0) returns(0){
-//     0x04 calldataload
-//     0x24 calldataload
-//     0x44 calldataload
-//     POW()
-//     0x00 mstore
-//     0x20 mstore
-//     0x20 0x00 return
-// }
+#define macro POW_LOCAL() = takes(0) returns(0){
+    0x04 calldataload
+    0x24 calldataload
+    0x44 calldataload
+    POW()
+    0x00 mstore
+    0x20 mstore
+    0x40 0x00 return
+}
 
 
 
@@ -167,7 +166,7 @@
    dup1 __FUNC_SIG(ln) eq ln_Z jumpi
     dup1 __FUNC_SIG(sqrt) eq sqrt_jump jumpi 
     dup1 __FUNC_SIG(expZ) eq exp_Z jumpi
-//         __FUNC_SIG(pow) eq pow jumpi
+    dup1    __FUNC_SIG(pow) eq pow_Z jumpi
 
     0x00 0x00 revert
 
@@ -207,8 +206,8 @@
     exp_Z:
     EXP_Z_LOCAL()
 
-    // pow:
-    // POW_LOCAL()
+    pow_Z:
+    POW_LOCAL()
 
 
 }

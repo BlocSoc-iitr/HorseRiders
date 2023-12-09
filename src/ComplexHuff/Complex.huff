@@ -419,42 +419,42 @@
   FROM_POLAR()
 }
 
-// ///@notice power of complex numbers
+///@notice power of complex numbers
 
-// #define macro POW() = takes(3) returns(2) {
-//    //INPUT STACK => [Re(a),Im(b),n]
+#define macro POW() = takes(3) returns(2) {
+   //INPUT STACK => [Re(a),Im(b),n]
 
-//     TO_POLAR()          // [r,T,n]
-//     swap1               // [T,r,n]
-//     dup3                // [n,T,r,n]
-//     mul                 // [n*T,r,n]
-//     swap2               // [n,r,n*T]
-//     swap1               // [r,n,n*T]
-//     dup2
-//     swap1
-//     exp                 // [r**n,n,n*T]
-//     swap1
-//     0x01
-//     swap1
-//     sub
-//     [X3]                // [1e18,n-1,r**n,n*T]
-//     exp
-//     swap1
-//     sdiv
-//     swap1
-//     dup1                // [n*T/1e18,n*T/1e18,r**n] , Let n*T/1e18 = x
-//     SIN()               // [sin(x),x,r**n]
-//     swap1               // [x,sin(x),r**n]
-//     COS()               // [cos(x),sin(x),r**n]
-//     dup3                // [r**n,cos(x),sin(x),r**n]
-//     mul                 // [r**n*cos(x),sin(x),r**n]
-//     swap2 
-//     mul                 // [r**n*sin(x),r**n*cos(x)]
-//     [X3]                // [1e18,r**n*sin(x),r**n*cos(x)]
-//     dup1                // [1e18,1e18,r**n*sin(x),r**n*cos(x)]
-//     swap2               // 
-//     sdiv                // [r**n*sin(x)/1e18 , 1e18 , r**n*cos(x)]
-//     swap2 
-//     sdiv                //[r**n*cos(x)/1e18,r**n*sin(x)/1e18]
+    TO_POLAR()          // [r,T,n]
+    swap1               // [T,r,n]
+    dup3                // [n,T,r,n]
+    mul                 // [n*T,r,n]
+    swap2               // [n,r,n*T]
+    swap1               // [r,n,n*T]
+    dup2
+    swap1
+    exp                 // [r**n,n,n*T]
+    swap1
+    0x01
+    swap1
+    sub
+    [X3]                // [1e18,n-1,r**n,n*T]
+    exp
+    swap1
+    sdiv
+    swap1
+    dup1                // [n*T/1e18,n*T/1e18,r**n] , Let n*T/1e18 = x
+    SIN()               // [sin(x),x,r**n]
+    swap1               // [x,sin(x),r**n]
+    COS()               // [cos(x),sin(x),r**n]
+    dup3                // [r**n,cos(x),sin(x),r**n]
+    mul                 // [r**n*cos(x),sin(x),r**n]
+    swap2 
+    mul                 // [r**n*sin(x),r**n*cos(x)]
+    [X3]                // [1e18,r**n*sin(x),r**n*cos(x)]
+    dup1                // [1e18,1e18,r**n*sin(x),r**n*cos(x)]
+    swap2               // 
+    sdiv                // [r**n*sin(x)/1e18 , 1e18 , r**n*cos(x)]
+    swap2 
+    sdiv                //[r**n*cos(x)/1e18,r**n*sin(x)/1e18]
 
-// }
+}

@@ -24,7 +24,7 @@ interface WRAPPER {
 
     function expZ(int256, int256) external returns (int256, int256);
 
-    //   function pow(int256, int256, int256) external returns (int256, int256);
+    function pow(int256, int256, int256) external returns (int256, int256);
 }
 
 contract Deploy is Script {
