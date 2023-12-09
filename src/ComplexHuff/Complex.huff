@@ -1,6 +1,6 @@
 #include './Constants.huff'
 // #include './Helper.huff'
-#include './PRBMath'
+#include './PRBMath.huff'
 #include './Trigonometry.huff'
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()

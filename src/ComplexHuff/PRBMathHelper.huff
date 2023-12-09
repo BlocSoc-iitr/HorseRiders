@@ -1,4 +1,4 @@
-#include './Constants.huff
+#include './Constants.huff'
 // #include './Helper.huff'
 
 #define macro GATE1() = takes(0) returns(0) {
