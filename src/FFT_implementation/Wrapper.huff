@@ -1,0 +1,75 @@
+#include './FFT.huff'
+
+#define function fft(int256[] memory, int256[] memory) view returns (int256[4] memory, int256[4] memory)
+
+///@notice storing values as desired in the fft implementation
+
+#define macro MEMORY_INIT() =takes(0) returns(0){
+    0x24 calldataload 
+    0x80 add
+    0x04 add
+    dup1 
+    calldataload                //[im[3],off(im[3])]
+    0x04 calldataload
+    0x80 add
+    0x04 add
+    swap1                       //[im[3],off(re[3],off(im[3])]
+    dup2                        
+    calldataload                //[re[3],im[3],off(re[3],off(im[3])]
+    0x20 dup5 sub
+    calldataload                //[im[2],re[3],im[3],off(re[3],off(im[3])]  
+    0x20 dup5 sub
+    calldataload                //[re[2],im[2],re[3],im[3],off(re[3],off(im[3])]
+    0x40 dup7 sub
+    calldataload                //[im[1],re[2],im[2],re[3],im[3],off(re[3],off(im[3])]
+    0x40 dup7 sub
+    calldataload                //[re[1],im[1],re[2],im[2],re[3],im[3],off(re[3],off(im[3])]
+    0x60 dup9 sub
+    calldataload                //[im[0].re[1],im[1],re[2],im[2],re[3],im[3],off(re[3],off(im[3])]
+    0x60 dup9 sub
+    calldataload                //[re[0],im[0].re[1],im[1],re[2],im[2],re[3],im[3],off(re[3],off(im[3])]
+    0x00 mstore
+    0x20 mstore
+    0x40 mstore
+    0x60 mstore
+    0x80 mstore
+    0xa0 mstore
+    0xc0 mstore
+    0xe0 mstore
+    pop pop
+}
+
+#define macro RETURN_MEMORY()=takes(0) returns(0){
+    0xe0 mload
+    0xa0 mload
+    0x60 mload
+    0x20 mload
+    0xc0 mload
+    0x80 mload
+    0x40 mload
+    0x00 mload
+    0x00 mstore
+    0x20 mstore
+    0x40 mstore
+    0x60 mstore
+    0x80 mstore
+    0xa0 mstore
+    0xc0 mstore
+    0xe0 mstore
+}
+
+#define macro FFT_LOCAL() =takes(0) returns (0){
+    MEMORY_INIT()              
+    FFT()
+    RETURN_MEMORY()
+    0x100 0x00 return 
+}
+
+#define macro MAIN()= takes (0) returns (0){
+    0x00 calldataload 0xE0 shr
+    __FUNC_SIG(fft) eq fft jumpi
+    0x00 0x00 revert
+
+    fft:
+    FFT_LOCAL()
+}

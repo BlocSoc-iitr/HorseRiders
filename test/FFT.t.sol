@@ -1,17 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console2} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
+import "foundry-huff/HuffDeployer.sol";
 import {FFT} from "../src/FFT_implementation/fft.sol";
 import "../src/complexMath/Trigonometry.sol";
+import "forge-std/console.sol";
 
 contract FFTTest is Test {
     FFT public fft;
+    Wrapper public fft_huff;
     int256[] real_part;
     int256[] complex_part;
+    int256 constant SCALE = 1e18;
 
     function setUp() public {
         fft = new FFT();
+        fft_huff = Wrapper(HuffDeployer.deploy("FFT_implementation/Wrapper"));
     }
 
     function test_finalFFT1() public {
@@ -34,8 +39,6 @@ contract FFTTest is Test {
         assertApproxEqAbs(im[2], 2 * 1e18, 1e15);
         assertApproxEqAbs(re[3], 0 * 1e18, 1e15);
         assertApproxEqAbs(im[3], -2 * 1e18, 1e15);
-        // real_part=;
-        // complex_part=[];
     }
 
     function test_finalFFT2() public {
@@ -76,9 +79,36 @@ contract FFTTest is Test {
         assertApproxEqAbs(re[7], 2.7071 * 1e18, 1e15);
         assertApproxEqAbs(im[7], -6.5355 * 1e18, 1e15);
     }
-    // // function test_trig() public {
-    // //     int sinVal = Trigonometry.sin(15707963267948966150);
-    // //     int cosVal = Trigonometry.cos(0);
-    // //     assertEq(sinVal, cosVal);
-    // // }
+
+    function test_trig() public {
+        int256 sinVal = Trigonometry.sin(1570796326794896615);
+        int256 cosVal = Trigonometry.cos(0);
+        assertApproxEqAbs(sinVal, cosVal, 1e15);
+    }
+
+    function test_fft_in_huff() public {
+        real_part.push(1 * 1e18);
+        real_part.push(-1 * 1e18);
+        real_part.push(0 * 1e18);
+        real_part.push(0 * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(0 * 1e18);
+        complex_part.push(1 * 1e18);
+        complex_part.push(-1 * 1e18);
+        int256[4] memory re;
+        int256[4] memory im;
+        (re, im) = fft_huff.fft(real_part, complex_part);
+        assertApproxEqAbs(re[0], 0 * 1e18, 1e15);
+        assertApproxEqAbs(im[0], 0 * 1e18, 1e15);
+        assertApproxEqAbs(re[1], 2 * 1e18, 1e15);
+        assertApproxEqAbs(im[1], 0 * 1e18, 1e15);
+        assertApproxEqAbs(re[2], 2 * 1e18, 1e15);
+        assertApproxEqAbs(im[2], 2 * 1e18, 1e15);
+        assertApproxEqAbs(re[3], 0 * 1e18, 1e15);
+        assertApproxEqAbs(im[3], -2 * 1e18, 1e15);
+    }
+}
+
+interface Wrapper {
+    function fft(int256[] memory, int256[] memory) external returns (int256[4] memory, int256[4] memory);
 }
