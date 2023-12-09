@@ -18,11 +18,11 @@ interface WRAPPER {
 
     //   function atan1to1(int256) external returns (int256);
 
-    //   function ln(int256, int256) external returns (int256);
+    function ln(int256, int256) external returns (int256, int256);
 
-    //   function sqrt(int256, int256) external returns (int256);
+    function sqrt(int256, int256) external returns (int256, int256);
 
-    //   function expZ(int256, int256) external returns (int256, int256);
+    function expZ(int256, int256) external returns (int256, int256);
 
     //   function pow(int256, int256, int256) external returns (int256, int256);
 }
