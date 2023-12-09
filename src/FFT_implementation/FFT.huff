@@ -14,6 +14,12 @@
     div 
 }
 
+#define macro SCALE_DOWN()=takes(1) returns(1){
+    [X3]
+    swap1 
+    sdiv
+}
+
 ///@notice initialising the 4 test values of (x,y) in the memory
 ///@dev initialise the memory with real values at multiples of 0x40 starting from zero 
 ///@dev and imaginary values at multiples of 0x40 starting from 0x20
@@ -63,28 +69,11 @@
     mul                            // [Phi_t_im,Phi_t_re,k]
 }
 
-#define macro INNER_CALC1() = takes(2) returns(3) {
-    //INPUT stack => [Phi_t_im,Phi_t_re,n,k]
-    dup1                           // [Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    dup1                           // [Phi_t_im,Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    mul                            // [Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    dup3                           // [Phi_t_re,Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    dup1                           // [Phi_t_re,Phi_t_re,Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    mul                            // [Phi_t_re*Phi_t_re,Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    [X3]                           // [1e18,Phi_t_re*Phi_t_re,Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    swap1                          // [Phi_t_re*Phi_t_re,1e18,Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    sdiv                           // [Phi_t_re*Phi_t_re/1e18,Phi_t_im*Phi_t_im,Phi_t_im,Phi_t_re,n,k]
-    swap1                          // [Phi_t_im*Phi_t_im,Phi_t_re*Phi_t_re/1e18,Phi_t_im,Phi_t_re,n,k]
-    [X3]                           // [1e18,Phi_t_im*Phi_t_im,Phi_t_re*Phi_t_re/1e18,Phi_t_im,Phi_t_re,n,k]
-    swap1                          // [Phi_t_im*Phi_t_im,1e18,Phi_t_re*Phi_t_re/1e18,Phi_t_im,Phi_t_re,n,k]
-    sdiv                           // [Phi_t_im*Phi_t_im/1e18,Phi_t_re*Phi_t_re/1e18,Phi_t_im,Phi_t_re,n,k]   
-    swap1                          // [Phi_t_re*Phi_t_re/1e18,Phi_t_im*Phi_t_im/1e18,Phi_t_im,Phi_t_re,n,k]
-    sub                            // [Phi_t_re*Phi_t_re/1e18-Phi_t_im*Phi_t_im/1e18,Phi_t_im,Phi_t_re,n,k]
-    swap2                          // [Phi_t_re,Phi_t_im,Phi_t_re',n,k] 
-    mul                            // [Phi_t_re*Phi_t_im,Phi_t_re',n,k]
-    [X3] swap1 sdiv
-    0x02                           // [2,Phi_t_re*Phi_t_im/1e18,Phi_t_re',n,k]
-    mul                            // [2*Phi_t_re*Phi_t_im/1e18,Phi_t_re',n,k] 
+#define macro INNER_CALC1() = takes(4) returns(3) {
+    //INPUT stack => [Phi_t_im,Phi_t_re,n,k] 
+    dup1 swap2 dup1                // [Phi_t_re,Phit_t_re,Phi_t_im,Phi_t_im,n,k]
+    MUL_Z()                         
+    SCALE_DOWN() swap1 SCALE_DOWN() 
     [X3]                           // [T_real,Phi_t_im,Phi_t_re,n,k]
     0x00                           // [T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     INNER_CALC2()                  // returns with [Phi_t_im,Phi_t_re,k]
@@ -104,26 +93,22 @@
  dup2                              // [T_real,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
  dup5  
  mul                               // [Phi_te_re*T_real,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
- [X3] swap1
- sdiv                              // [Phi_te_re*T_real/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
+ SCALE_DOWN()                      // [Phi_te_re*T_real/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
  dup2                              // [T_im,Phi_te_re*T_real/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
  dup5                              // [Phi_t_im,T_im,Phi_te_re*T_real/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
  mul
- [X3] swap1
- sdiv                              // [Phi_t_im*T_im/1e18,Phi_te_re*T_real/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
+ SCALE_DOWN()                      // [Phi_t_im*T_im/1e18,Phi_te_re*T_real/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
  swap1
  sub                               // [Phi_te_re*T_real/1e18-Phi_t_im*T_im/1e18,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k] , Let Phi_te_re*T_real/1e18-Phi_t_im*T_im/1e18 = T_real
                                    // [T_real,T_im,T_real_temp,Phi_t_im,Phi_t_re,n,k]
  swap2 swap1                       // [T_im,T_real_temp,T_real,Phi_t_im,Phi_t_re,n,k]
  dup5                              // [Phi_t_re,T_im,T_real_temp,T_real,Phi_t_im,Phi_t_real,n,k]
  mul
- [X3] swap1
- sdiv                              // [Phi_t_re*T_im/1e18,T_real_temp,T_real,Phi_t_im,Phi_t_re,n,k]
+ SCALE_DOWN()                      // [Phi_t_re*T_im/1e18,T_real_temp,T_real,Phi_t_im,Phi_t_re,n,k]
  swap1 
  dup4                              // [Phi_t_im,T_real_temp,Phi_t_re*T_im/1e18,T_real,Phi_t_im,Phi_t_re,n,k]
  mul
- [X3] swap1
- sdiv
+ SCALE_DOWN()
  add                               // [Phi_t_im*T_real_temp/1e18+Phi_t_re*T_im/1e18,T_real,Phi_t_im,Phi_t_re,T_real,n,k] , Let Phi_t_im*T_real_temp/1e18+Phi_t_re*T_im/1e18 = T_im
                                    // [T_im,T_real,Phi_t_im,Phi_t_re,T_real,n,k]
  0x2000
@@ -291,36 +276,29 @@
     0x40 mul mload                  // [Re(b),b,T_im,T_real,Phi_t_im,Phi_t_re,n,k]       
     swap1                           // [b,Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     0x40 mul 0x20 add mload         // [Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
-    0x2200 mload                    // [a,a,Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
+    0x2200 mload                    // [a,Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     dup1                            // [a,a,Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     0x40 mul mload                  // [Re(a),a,Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k] 
     swap1                           // [a,Re(a),Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k] 
     0x40 mul 0x20 add mload         // [Im(a),Re(a),Im(b),Re(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     swap3                           // [Re(b),Re(a),Im(b),Im(a),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     swap2 swap3 swap2 swap1         // [Re(a),Re(b),Im(a),Im(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
-    dup4
-    dup4
-    dup4
-    dup4
-    SUB_Z()                         // [t_real,t_im,Re(a),Re(b),Im(a),Im(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
-    0x2400 mstore
-    0x2600 mstore
-    ADD_Z()                         // [t_real',t_im',T_im,T_real,Phi_t_im,Phi_t_re,n,k]
+    dup4 dup4 dup4 dup4
+    ADD_Z()                         // [t_real',t_im',Re(a),Re(b),Im(a),Im(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     0x2200 mload
     0x40 mul
     mstore
     0x2200 mload
     0x40 mul 0x20 add 
-    mstore                          // [T_im,T_real,Phi_t_im,Phi_t_re,n,k]
-    0x2400 mload
-    0x2600 mload                    // [t_im,t_real,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
+    mstore                          // [Re(a),Re(b),Im(a),Im(b),T_im,T_real,Phi_t_im,Phi_t_re,n,k]                   
+    SUB_Z() swap1                   // [t_im,t_real,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     dup3 swap2                      // [t_real,t_im,T_im,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
-    dup5 swap1 
-    swap3                           // [T_real,t_real,T_im,t_im,Phi_t_im,Phi_t_re,n,k]
+    dup5 swap1                      // [t_real,T_real,t_im,T_im,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
+    // swap3                           // [T_real,t_real,T_im,t_im,Phi_t_im,Phi_t_re,n,k]
     MUL_Z()                         // [re,im,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
-    [X3] swap1 sdiv
+    SCALE_DOWN()
     swap1
-    [X3] swap1 sdiv
+    SCALE_DOWN()
     swap1
     0x2200 mload                    // [a,re,im,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     dup9 add                        // [b,re,im,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
