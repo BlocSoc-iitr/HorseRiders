@@ -1,7 +1,7 @@
 #include './CONSTANTS.huff'
-#include '../ComplexHuff/Trigonometry.huff'
-#include '../ComplexHuff/Complex.huff'  
-// #include '../ComplexHuff/PRBMath.huff'
+// #include '../ComplexHuff/Trigonometry.huff'
+// #include '../ComplexHuff/Complex.huff'  
+#include '../ComplexHuff/PRBMath.huff'
 #include '../ComplexHuff/Constants.huff'
 // #include '../ComplexHuff/Helper.huff'
 
@@ -127,10 +127,10 @@
 }
 
 #define macro REVERSE_BITS() = takes(0) returns(0) {
-    // [N]                            // [N]
-    // LOG2()                         // [LOG2(N)]
-    // bug in the PRBMath library
-    0x02
+    [N]                            // [N]
+    [X3] mul
+    LOG2()                         // [LOG2(N)]
+    SCALE_DOWN()
     0x00                           // [0,m]
     Looper_calc3:                  // [a,m]
     dup1                           // [b=a,a,m]

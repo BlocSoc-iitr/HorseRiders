@@ -1,5 +1,5 @@
-#include './Constants.huff
-#include './Helper.huff'
+#include './Constants.huff'
+#include './Complex.huff'
 
 #define macro GATE1() = takes(3) returns(2) {
     //Input Stack [result,xn,x] 
@@ -124,6 +124,8 @@
     conditional_jumpi
     jumpi
     0x01               //[1,x]
+    end
+    jump
 
     conditional_jumpi: // [x]
     [X3]               // [1e18,x]
@@ -131,11 +133,13 @@
     mul                // [1e18*1e18,x]
     sdiv               // [1e18*1e18/x]
     PUT_NEG1()         // [-1,x]
+
+    end:
 }
 
-#define macro MOST_SIGNIFICANT_BIT() = takes(2) returns(1) {
-    // Input Stack => [0,x]
-
+#define macro MOST_SIGNIFICANT_BIT() = takes(1) returns(1) {
+    // Input Stack => [x]
+    0x00
     PASS1()
     PASS2()
     PASS3()
@@ -144,173 +148,166 @@
     PASS6()
     PASS7()
     PASS8()
+    swap1 pop             // [msb]
 
 }
 
 #define macro PASS1() = takes(2) returns(2){
   //Input Stack => [msb,x]
 
-  0x8             // [128,msb,x]
-  0x2             // [2,128,msb,x]
+  0x80            // [128,msb,x]
+  0x02            // [2,128,msb,x]
   exp             // [2**128,msb,x]
   dup3            // [x,2**128,msb,x]
   slt             // [x<2**128,msb,x]
-  iszero          // [x>=2**128,msb,x]
   condition_met1
   jumpi
 
-  condition_met1: // [msb,x]
   0x80            // [128,msb,x]
   add             // [msb+128,x]
   swap1           // [x,msb+128]
   0x80            // [128,x,msb+128]
   shr             // [x>>128,msb]
   swap1           // [msb,x>>128]
-
+  condition_met1: // [msb,x]
 } 
 
 #define macro PASS2() = takes(2) returns(2){
   //Input Stack => [msb,x]
 
   0x40            // [64,msb,x]
-  0x2             // [2,64,msb,x]
+  0x02            // [2,64,msb,x]
   exp             // [2**64,msb,x]
   dup3            // [x,2**64,msb,x]
   slt             // [x<2**64,msb,x]
-  iszero          // [x>=2**64,msb,x]
   condition_met2
   jumpi
 
-  condition_met2: // [msb,x]
   0x40            // [64,msb,x]
   add             // [msb+64,x]
   swap1           // [x,msb+64]
   0x40            // [64,x,msb+64]
   shr             // [x>>64,msb]
   swap1           // [msb,x>>64]
+  condition_met2: // [msb,x]
 } 
 
 #define macro PASS3() = takes(2) returns(2){
   //Input Stack => [msb,x]
 
-  0x2              // [32,msb,x]
-  0x2              // [2,32,msb,x]
+  0x20             // [32,msb,x]
+  0x02             // [2,32,msb,x]
   exp              // [2**32,msb,x]
   dup3             // [x,2**32,msb,x]
   slt              // [x<2**32,msb,x]
-  iszero           // [x>=2**32,msb,x]
   condition_met3
   jumpi
 
-  condition_met3:  // [msb,x]
   0x20             // [32,msb,x]
   add              // [msb+32,x]
   swap1            // [x,msb+32]
   0x20             // [32,x,msb+32]
   shr              // [x>>32,msb]
-  swap1            // [msb,x>>32]  
+  swap1            // [msb,x>>32] 
+  condition_met3:  // [msb,x] 
 }
 
 #define macro PASS4() = takes(2) returns(2){
   //Input Stack => [msb,x]
 
-  0x10              // [16,msb,x]
-  0x2              // [2,16,msb,x]
+  0x10             // [16,msb,x]
+  0x02             // [2,16,msb,x]
   exp              // [2**16,msb,x]
   dup3             // [x,2**16,msb,x]
   slt              // [x<2**16,msb,x]
-  iszero           // [x>=2**16,msb,x]
   condition_met4
   jumpi
 
-  condition_met4:  // [msb,x]
   0x10             // [16,msb,x]
   add              // [msb+16,x]
   swap1            // [x,msb+16]
   0x10             // [16,x,msb+16]
   shr              // [x>>16,msb]
   swap1            // [msb,x>>16]  
+  condition_met4:  // [msb,x]
 }
 
 #define macro PASS5() = takes(2) returns(2){
   //Input Stack => [msb,x]
 
-  0x8               // [8,msb,x]
-  0x2               // [2,8,msb,x]
+  0x08              // [8,msb,x]
+  0x02              // [2,8,msb,x]
   exp               // [2**8,msb,x]
   dup3              // [x,2**8,msb,x]
   slt               // [x<2**8,msb,x]
-  iszero            // [x>=2**8,msb,x]
   condition_met5
   jumpi
-
-  condition_met5:   // [msb,x]
+  
   0x8               // [8,msb,x]
   add               // [msb+8,x]
   swap1             // [x,msb+8]
   0x8               // [8,x,msb+8]
   shr               // [x>>8,msb]
-  swap1             // [msb,x>>8]  
+  swap1             // [msb,x>>8] 
+  condition_met5:   // [msb,x]
+ 
 }
 
 #define macro PASS6() = takes(2) returns(2){
   //Input Stack => [msb,x]
-  0x4               // [4,msb,x]
-  0x2               // [2,4,msb,x]
+  0x04              // [4,msb,x]
+  0x02              // [2,4,msb,x]
   exp               // [2**4,msb,x]
   dup3              // [x,2**4,msb,x]
   slt               // [x<2**4,msb,x]
-  iszero            // [x>=2**4,msb,x]
   condition_met6
   jumpi
 
-  condition_met6:   // [msb,x]
   0x4               // [4,msb,x]
   add               // [msb+4,x]
   swap1             // [x,msb+4]
   0x4               // [4,x,msb+4]
   shr               // [x>>4,msb]
   swap1             // [msb,x>>4]  
+  condition_met6:   // [msb,x]
 }
 
 #define macro PASS7() = takes(2) returns(2){
  //Input Stack => [msb,x]
 
-  0x2               // [2,msb,x]
-  0x2               // [2,2,msb,x]
+  0x02              // [2,msb,x]
+  0x02              // [2,2,msb,x]
   exp               // [2**2,msb,x]
   dup3              // [x,2**2,msb,x]
   slt               // [x<2**2,msb,x]
-  iszero            // [x>=2**2,msb,x]
   condition_met7
   jumpi
 
-  condition_met7:   // [msb,x]
   0x2               // [2,msb,x]
   add               // [msb+2,x]
   swap1             // [x,msb+2]
   0x2               // [2,x,msb+2]
   shr               // [x>>2,msb]
   swap1             // [msb,x>>2] 
+  condition_met7:   // [msb,x]
+
 }
 
-#define macro PASS8() = takes(2) returns(1){
+#define macro PASS8() = takes(2) returns(2){
   //Input Stack => [msb,x]
 
-  0x1               // [1,msb,x]
-  0x2               // [2,1,msb,x]
+  0x01              // [1,msb,x]
+  0x02              // [2,1,msb,x]
   exp               // [2**1,msb,x]
   dup3              // [x,2**1,msb,x]
   slt               // [x<2**1,msb,x]
-  iszero            // [x>=2**1,msb,x]
   condition_met8
   jumpi
 
-  condition_met8:   // [msb,x]
-  0x1               // [1,msb,x]
+  0x01              // [1,msb,x]
   add               // [msb+1,x]
-  swap1             // [x,msb+1]
-  pop               // [msb+1]
+  condition_met8:   // [msb,x]
+
 } 
 
 #define macro HELPIT() = takes(4) returns(4){
@@ -321,15 +318,14 @@
   0x02              // [2,1e18,y,y,delta,res,sign]
   mul               // [2*1e18,y,y,delta,res,sign]
   sgt               // [2*1e18>y,y,delta,res,sign]
-  iszero            // [2*1e18<=y ? ,y,delta,res,sign]
   condition_ok
   jumpi
 
-  condition_ok:     // [y,delta,res,sign]
   0x01              // [1,y,delta,res,sign]
   shr               // [y>>1,delta,res,sign]
   swap2             // [res,delta,y>>1,sign]
   dup2              // [delta,res,delta,y>>1,sign]
   add               // [res+delta,delta,y>>1,sign]
   swap2             // [y>>1,delta,res+delta,sign]
+  condition_ok:     // [y,delta,res,sign]
 }
