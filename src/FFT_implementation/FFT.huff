@@ -9,7 +9,7 @@
 ///@dev theta_t = pi/n
 
 #define macro PUT_THETA_T() = takes(0) returns(1) {
-    [N]
+    N()
     [PI]
     div 
 }
@@ -18,6 +18,12 @@
     [X3]
     swap1 
     sdiv
+}
+
+#define macro N()=takes(0) returns(1){
+    0x04 calldataload 
+    0x04 add
+    calldataload
 }
 
 ///@notice initialising the 4 test values of (x,y) in the memory
@@ -40,7 +46,7 @@
 ///@dev the FFT macro updates the 4 test values in the memory with the final values of the FFT
 
 #define macro FFT() = takes(0) returns(0) {
-    [N]                            // [k]
+    N()                            // [k]
     PUT_PHI_T()                    // [Phi_t_im,Phi_t_re,k]
    loop1:
      dup3                          // [k,Phi_t_im,Phi_t_re,n]
@@ -127,7 +133,7 @@
 }
 
 #define macro REVERSE_BITS() = takes(0) returns(0) {
-    [N]                            // [N]
+    N()                            // [N]
     [X3] mul
     LOG2()                         // [LOG2(N)]
     SCALE_DOWN()
@@ -194,7 +200,7 @@
     0x01                           // [1,a,m]
     add                            // [a+1,m]
     dup1                           // [a+1,a+1,m]
-    [N]                            // [N,a+1,a+1,m]
+    N()                            // [N,a+1,a+1,m]
     gt                             // [N>a+1,a+1,m]
     Looper_calc3
     jumpi
@@ -310,7 +316,7 @@
     add                             // [a+n,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     dup1                            // [a+n,a+n,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     0x2200 mstore
-    [N]                             // [N,a+n,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
+    N()                             // [N,a+n,T_im,T_real,Phi_t_im,Phi_t_re,n,k]
     gt
     LOOP_last
     jumpi 
