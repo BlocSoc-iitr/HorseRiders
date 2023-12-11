@@ -94,60 +94,7 @@
     dup1             // [b,b,a*a]
     mul              // [b*b,a*a]
     add              // [b*b+a*a]
-    SQRT_NEW()       // [sqrt]
-}
-
-#define macro SQRT_NEW() = takes(1) returns(1) {
-    //[b*b+a*a] <= x**2
-    //push in memory
-    [VALUE_LOCATION]
-    sstore   //[]
-    0x01 //[0x01]
-    loop:          //get x**2 from memory and push in stack
-    [VALUE_LOCATION]   //[ptr,0x01(i)]
-    sload         //[x*x,i]
-    0x2710
-    mul
-    dup2          //[i,x2,i]
-    0x01          //[0x01,i,x2,i]
-    swap1          //[i,0x01,x2,i]
-    sub          //[i-1,x2,i]
-    swap2        //[i,x2,i-1]
-    dup1
-    mul          //[i*i,x*x,i-1]
-    eq ans jumpi      //[i*i==x**2?,i-1] //[i-1]
-    0x01
-    add               //[i]
-    [VALUE_LOCATION]   //[ptr,i]
-    sload          //[x**2,i]
-    0x2710
-    mul
-    dup2            //[i,x2,i]
-    0x01 
-    swap1 
-    sub          //[i-1,x2,i]
-    swap2        //[i,x2,i-1]
-    dup1         
-    mul          //[i*i,x*x,i-1]
-    gt exit jumpi //[i-1]
-    0x02 
-    add         //[i+1]
-    loop 
-    jump
-
-    ans:
-    0x01
-    add // [i]
-    result jump
-    
-    exit: 
-    result jump
-
-    result:
-    [X15]
-    mul
-    [VALUE_LOCATION]
-    sstore
+    SQRT_PRB()       // [sqrt]
 }
 
 /// @notice
@@ -158,9 +105,7 @@
 
     dup2      //[i,r,i]
     dup2       //[r,i,r,i]
-    CALC_R()   // [r,i]
-    [VALUE_LOCATION]  
-    sload            // [r,Re(a),IM(a)]
+    CALC_R()
     swap2            // [Im(a),Re(a),r]
     [X3]
     mul 
@@ -370,41 +315,27 @@
    dup2
    dup2                   // [re,im,re,im]
    CALC_R()
-   [VALUE_LOCATION]
-   sload                  // [r,re,im]
    dup2                   // [re,r,re,im]
-   [X3]
-   mul
-   dup2                   // [r,re*1e18,r,re,im]
-   swap3
-   [X3]
-   mul                    // [re*1e18,re*1e18,r,r,im]
-   swap3                  // [r,re*1e18,r,re*1e18,im]
+   dup2                   // [r,re,r,re,im]
    add                    // [r+re,r,re,im]
    0x02                   
    swap1
    sdiv                   // [re+r/2,r,re,im]
+   [X3]
+   mul
    swap2                  // [re,r,re+r/2,im]
    swap1
    sub                    // [r-re,re+r/2,im]
    0x02
    swap1
    sdiv                   // [r-re/2,re+r/2,im]
+   [X3]
+   mul
    swap2
    pop                    // [x**2,y**2]
-   [X15]
+   SQRT_PRB()
    swap1
-   sdiv                   // [x**2/1e16,y**2]
-   SQRT_NEW()
-   [VALUE_LOCATION]
-   sload                  // [x,y**2]
-   swap1
-   [X15]
-   swap1
-   sdiv
-   SQRT_NEW()
-   [VALUE_LOCATION]
-   sload
+   SQRT_PRB()
    swap1                  // [x,y]
 }
 

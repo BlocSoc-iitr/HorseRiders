@@ -75,8 +75,6 @@
     0x04 calldataload
     0x24 calldataload
     CALC_R()
-    [VALUE_LOCATION]
-    sload
     0x00 mstore
     0x20 0x00 return
 }

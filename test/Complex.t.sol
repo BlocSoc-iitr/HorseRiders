@@ -39,13 +39,13 @@ contract ComplexTest is Test {
     }
 
     function testCalcR() public {
-        uint256 r = complex.calcR(4, 4);
-        assertEq(r * 100 / uint256(scale), 565);
+        uint256 r = complex.calcR(4 * scale, 4 * scale);
+        assertEq(r / uint256(scale), 5);
     }
 
     function testToPolar() public {
         (int256 r, int256 t) = complex.toPolar(3, 4);
-        assertEq(r / scale, 5);
+        assertEq(r, 5);
         assertEq((t * 100) / scale, 65);
     }
 
@@ -56,9 +56,9 @@ contract ComplexTest is Test {
     }
 
     function testSqrt() public {
-        (int256 r, int256 i) = complex.sqrt(12, -5);
-        assertEq(r / scale2, 2);
-        assertEq(i / scale2, 3);
+        (int256 r, int256 i) = complex.sqrt(12 * scale, -5 * scale);
+        assertEq(r / scale, 2);
+        assertEq(i / scale, 3);
     }
 
     function testExpZ() public {
@@ -67,16 +67,16 @@ contract ComplexTest is Test {
         assertApproxEqAbs(i, 2174400000000000000, 1e15);
     }
 
-    function testLnZ() public {
-        (int256 r, int256 i) = complex.ln(30, 40);
-        assertEq(r * 100 / scale, 391); // ln(50) = 3.912..
-        assertEq(i * 100 / scale, 65);
+    function testPowZ() public {
+        (int256 r, int256 i) = complex.pow(2, 3 * scale, 2 * scale);
+        assertApproxEqAbs(r, -5 * scale, 5e17);
+        assertApproxEqAbs(i, 12 * scale, 5e17);
     }
 
-    function testPowZ() public {
-        (int256 r, int256 i) = complex.pow(2, 3, 2);
-        assertApproxEqAbs(r, -5 * scale, 5e17); // 5e17 i.e. roundoff precision upto whole no. (precision might inc if calcR is optimized)
-        assertApproxEqAbs(i, 12 * scale, 1e17); // precision : upto 1 decimal point
+    function testLnZ() public {
+        (int256 r, int256 i) = complex.ln(30 * scale, 40 * scale);
+        assertEq(r * 100 / scale, 391); // ln(50) = 3.912..
+        assertEq(i * 100 / scale, 65);
     }
 }
 
