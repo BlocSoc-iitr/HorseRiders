@@ -28,7 +28,7 @@
 }
 
 #define macro PUT_X3_CUBE() = takes(0) returns(1){
-   0x03        //[2]
+   0x03        //[3]
    [X3]        //[1e18,3]
    exp         //[1e54]
 }

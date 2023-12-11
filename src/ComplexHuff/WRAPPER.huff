@@ -161,7 +161,7 @@
     dup1 __FUNC_SIG(fromPolar) eq from_Polar jumpi
 //    dup1 __FUNC_SIG(p_atan2) eq p_atan2 jumpi
 //    dup1 __FUNC_SIG(atan1to1) eq atan1to1 jumpi
-   dup1 __FUNC_SIG(ln) eq ln_Z jumpi
+    dup1 __FUNC_SIG(ln) eq ln_Z jumpi
     dup1 __FUNC_SIG(sqrt) eq sqrt_jump jumpi 
     dup1 __FUNC_SIG(expZ) eq exp_Z jumpi
     dup1    __FUNC_SIG(pow) eq pow_Z jumpi
