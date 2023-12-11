@@ -8,6 +8,7 @@ import "forge-std/console.sol";
 contract ComplexTest is Test {
     WRAPPER public complex;
     int256 scale = 1e18;
+    int256 scale2 = 1e19;
 
     function setUp() public {
         complex = WRAPPER(HuffDeployer.deploy("ComplexHuff/WRAPPER"));
@@ -38,20 +39,44 @@ contract ComplexTest is Test {
     }
 
     function testCalcR() public {
-        uint256 r = complex.calcR(3, 4);
-        assertEq(r, 5);
+        uint256 r = complex.calcR(4, 4);
+        assertEq(r * 100 / uint256(scale), 565);
     }
 
     function testToPolar() public {
-        (int256 r, int256 t) = complex.toPolar(4, 3);
-        assertEq(r, 5);
-        assertEq((t * 100) / scale, 92);
+        (int256 r, int256 t) = complex.toPolar(3, 4);
+        assertEq(r / scale, 5);
+        assertEq((t * 100) / scale, 65);
     }
 
     function testFromPolar() public {
         (int256 r, int256 i) = complex.fromPolar(5 * scale, 92729522 * 1e10);
         assertApproxEqAbs(r, 3 * scale, 1e15);
         assertApproxEqAbs(i, 4 * scale, 1e15);
+    }
+
+    function testSqrt() public {
+        (int256 r, int256 i) = complex.sqrt(12, -5);
+        assertEq(r / scale2, 2);
+        assertEq(i / scale2, 3);
+    }
+
+    function testExpZ() public {
+        (int256 r, int256 i) = complex.expZ(92729522 * 1e10, 1);
+        assertApproxEqAbs(r, 1630800000000000000, 1e15);
+        assertApproxEqAbs(i, 2174400000000000000, 1e15);
+    }
+
+    function testLnZ() public {
+        (int256 r, int256 i) = complex.ln(30, 40);
+        assertEq(r * 100 / scale, 391); // ln(50) = 3.912..
+        assertEq(i * 100 / scale, 65);
+    }
+
+    function testPowZ() public {
+        (int256 r, int256 i) = complex.pow(2, 3, 2);
+        assertApproxEqAbs(r, -5 * scale, 5e17); // 5e17 i.e. roundoff precision upto whole no. (precision might inc if calcR is optimized)
+        assertApproxEqAbs(i, 12 * scale, 1e17); // precision : upto 1 decimal point
     }
 }
 
@@ -74,11 +99,11 @@ interface WRAPPER {
 
     // function atan1to1(int256) external returns (int256);
 
-    // function ln(int256, int256) external returns (int256);
+    function ln(int256, int256) external returns (int256, int256);
 
-    // function sqrt(int256, int256) external returns (int256);
+    function sqrt(int256, int256) external returns (int256, int256);
 
-    // function expZ(int256, int256) external returns (int256, int256);
+    function expZ(int256, int256) external returns (int256, int256);
 
-    // function pow(int256, int256, int256) external returns (int256, int256);
+    function pow(int256, int256, int256) external returns (int256, int256);
 }

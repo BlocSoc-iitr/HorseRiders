@@ -14,3 +14,5 @@
 #define constant LOG2_E = 0x14057B7EF767814F     // 1.4426950408889634e18
 #define constant HALF_SCALE = 0x6F05B59D3B20000  //5e17
 #define constant X13 = 0x3B9ACA00                 // 1e9
+#define constant X14 = 0x1CC2C05DBC54   // 1e(13.5)
+#define constant X15 = 0x2386F26FC10000         // 1e16

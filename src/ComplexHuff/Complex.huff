@@ -1,6 +1,6 @@
 #include './Constants.huff'
-#include './Helper.huff'
-// #include './PRBMath'
+// #include './Helper.huff'
+#include './PRBMath.huff'
 #include './Trigonometry.huff'
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
@@ -99,13 +99,15 @@
 
 #define macro SQRT_NEW() = takes(1) returns(1) {
     //[b*b+a*a] <= x**2
-    //push in memory 
+    //push in memory
     [VALUE_LOCATION]
     sstore   //[]
     0x01 //[0x01]
     loop:          //get x**2 from memory and push in stack
     [VALUE_LOCATION]   //[ptr,0x01(i)]
     sload         //[x*x,i]
+    0x2710
+    mul
     dup2          //[i,x2,i]
     0x01          //[0x01,i,x2,i]
     swap1          //[i,0x01,x2,i]
@@ -118,6 +120,8 @@
     add               //[i]
     [VALUE_LOCATION]   //[ptr,i]
     sload          //[x**2,i]
+    0x2710
+    mul
     dup2            //[i,x2,i]
     0x01 
     swap1 
@@ -140,12 +144,14 @@
     result jump
 
     result:
+    [X15]
+    mul
     [VALUE_LOCATION]
     sstore
 }
 
-// /// @notice
-// //cartesian to polar 
+/// @notice
+//cartesian to polar 
 
 #define macro TO_POLAR() = takes(2) returns(2) {
     // INPUT STACK => [RE(a),IM(a)]
@@ -203,9 +209,7 @@
     add
     add
     swap1
-    0x00 mstore
-    0x20 mstore
-    0x40 0x00 return
+    finish jump
 
     case1:
     dup1             // [x1,x1,r]
@@ -234,19 +238,14 @@
     sdiv             // [x3,x2,x1,r]
     add               // [x3+x2,x1,r]
     add               // [theta,r]
-    0x00 mstore
-    0x20 mstore
-    0x40 0x00 return
-    swap1             // [r,theta]
+    swap1
+    finish jump
 
     case2:
     pop //[r]
     [PI_QUARTER]
     swap1
-    0x00 mstore
-    0x20 mstore
-    0x40 0x00 return
-
+    finish:
 }
 
 /// @notice
@@ -258,14 +257,14 @@
     dup1             // [T,T,r]
     0x00             // [0,T,T,r]
     slt              // [0<T,T,r]
-    case2
-    jumpi
+    case2 jumpi
+
     dup2             // [r,T,r]
     dup2             // [T,r,T,r]
     0x01
     0x00
     sub              // [-1,T,r,T,r]
-    mul              // [-1T,r,T,r]
+    mul              // [-T,r,T,r]
     SIN()            // [sin(-T),r,T,r]
     mul              // [sin(-T)*r,T,r]
     0x01
@@ -277,12 +276,12 @@
     sdiv             // [-sin(-T)*r/1e18,T,r]
     swap1            // [T,-sin(-T)*r/1e18,r]
     COS()            // [cos(T),-sin(-T)*r/1e18,r]
-    swap1 
+    swap1            // [-sin(-T)*r/1e18, cos(T),r]
     swap2            // [r,cos(T),-sin(-T)*r/1e18]
     mul              // [r*cos(T),-sin(-T)*r/1e18]
     [X3]             // [1e18,r*cos(T),-sin(-T)*r/1e18]
     swap1            // [r*cos(T),1e18,-sin(-T)*r/1e18]]
-    sdiv             // [r*cos(T),1e18,-sin(-T)*r/1e18]
+    sdiv             // [r*cos(T)/1e18,-sin(-T)*r/1e18]
     0x00 mstore
     0x20 mstore
     0x40 0x00 return
@@ -358,96 +357,104 @@
 //  sdiv                  // [X5*x/1e18-(x*(x-1e18)/1e18)*(X6+x*X7/1e18)/1e18]
 // }
 
-// #define macro LN() = takes(2) returns(1) {
-//    //INPUT STACK => [Re(A),Im(A)]
+#define macro LN() = takes(2) returns(1) {
+   //INPUT STACK => [Re(A),Im(A)]
 
-//    TO_POLAR()          // [r,T]
-//    LOGE_PRB()          // [ln(r),T]
-// }
+   TO_POLAR()          // [r,T]
+   LOGE_PRB()          // [ln(r),T]
+}
 
-// #define macro SQRT() = takes(2) returns(1){
-//    //INPUT STACK => [Re(A),Im(A)]
+#define macro SQRT() = takes(2) returns(2){
+   //INPUT STACK => [Re(A),Im(A)]
 
-//    dup2                // [Im(A),Re(A),Im(A)]
-//    iszero              // [Im(A)==0?,Re(A),Im(A)]
-//    ImaginaryZero
-//    jumpi               // [Re(A),Im(A)]
-//    dup1                // [Re(A),Re(A),Im(A)]
-//    iszero              // [Re(A)==0?,Re(A),Im(A)]
-//    RealZero
-//    jumpi
-//    TO_POLAR()          // [r,T]
-//    SQRT_PRB()          // [sqrt(r),T]
-//    swap1               // [T,sqrt(r)]
-//    0x02                // [2,T,sqrt(r)]
-//    swap1               // [T,2,sqrt(r)]
-//    sdiv                // [T/2,sqrt(r)]
-//    swap1               // [sqrt(r),T/2]
+   dup2
+   dup2                   // [re,im,re,im]
+   CALC_R()
+   [VALUE_LOCATION]
+   sload                  // [r,re,im]
+   dup2                   // [re,r,re,im]
+   [X3]
+   mul
+   dup2                   // [r,re*1e18,r,re,im]
+   swap3
+   [X3]
+   mul                    // [re*1e18,re*1e18,r,r,im]
+   swap3                  // [r,re*1e18,r,re*1e18,im]
+   add                    // [r+re,r,re,im]
+   0x02                   
+   swap1
+   sdiv                   // [re+r/2,r,re,im]
+   swap2                  // [re,r,re+r/2,im]
+   swap1
+   sub                    // [r-re,re+r/2,im]
+   0x02
+   swap1
+   sdiv                   // [r-re/2,re+r/2,im]
+   swap2
+   pop                    // [x**2,y**2]
+   [X15]
+   swap1
+   sdiv                   // [x**2/1e16,y**2]
+   SQRT_NEW()
+   [VALUE_LOCATION]
+   sload                  // [x,y**2]
+   swap1
+   [X15]
+   swap1
+   sdiv
+   SQRT_NEW()
+   [VALUE_LOCATION]
+   sload
+   swap1                  // [x,y]
+}
 
-//    ImaginaryZero:
-//    IMAG_ZERO()
-
-//    RealZero:
-//     pop                // [Im(A)]
-//     0x02               // [2,Im(A)]
-//     swap1              // [Im(A),2]
-//     ABS()              // [abs(Im(A)),2]
-//     sdiv               // [abs(Im(A))/2]
-//     SQRT_PRB()         // [sqrt(abs(Im(A))/2)]
-//     dup1               // [sqrt(abs(Im(A))/2),sqrt(abs(Im(A))/2)]
-//     0x00               // [0,sqrt(abs(Im(A))/2),sqrt(abs(Im(A))/2)]
-//     slt                // [0<sqrt(abs(Im(A))/2) ? , sqrt(abs(Im(A))/2)]
-//     cond_satisfy
-//     jumpi 
-//     dup1               // [sqrt(abs(Im(A))/2),sqrt(abs(Im(A))/2)]
-//     PUT_NEG1()         // [-1,sqrt(abs(Im(A))/2),sqrt(abs(Im(A))/2)]
-//     mul                // [-sqrt(abs(Im(A))/2),sqrt(abs(Im(A))/2)]
-//     swap1              // [sqrt(abs(Im(A))/2),-sqrt(abs(Im(A))/2)]
-
-//     cond_satisfy:
-//     dup1               // [sqrt(abs(Im(A))/2),sqrt(abs(Im(A))/2)]
-// }
 
 // ///@notice e^(a+bi) calculation
 
-// #define macro EXP_Z() = takes(2) returns(2) {
-//  //INPUT STACK => [Re(A),Im(A)]
+#define macro EXP_Z() = takes(2) returns(2) {
+ //INPUT STACK => [Re(A),Im(A)]
+  [e]                  // [e,Re(A),Im(A)]
+  exp                  // [e**Re(A),Im(A)]
+  swap1
+  FROM_POLAR()
+}
 
-//   [e]                  // [e,Re(A),Im(A)]
-//   exp                  // [e**Re(A),Im(A)]
-//   FROM_POLAR()
+///@notice power of complex numbers
 
-// }
+#define macro POW() = takes(3) returns(2) {
+   //INPUT STACK => [Re(a),Im(b),n]
 
-// ///@notice power of complex numbers
+    TO_POLAR()          // [r,T,n]
+    swap1               // [T,r,n]
+    dup3                // [n,T,r,n]
+    mul                 // [n*T,r,n]
+    swap2               // [n,r,n*T]
+    swap1               // [r,n,n*T]
+    dup2
+    swap1
+    exp                 // [r**n,n,n*T]
+    swap1
+    0x01
+    swap1
+    sub
+    [X3]                // [1e18,n-1,r**n,n*T]
+    exp
+    swap1
+    sdiv
+    swap1
+    dup1                // [n*T/1e18,n*T/1e18,r**n] , Let n*T/1e18 = x
+    SIN()               // [sin(x),x,r**n]
+    swap1               // [x,sin(x),r**n]
+    COS()               // [cos(x),sin(x),r**n]
+    dup3                // [r**n,cos(x),sin(x),r**n]
+    mul                 // [r**n*cos(x),sin(x),r**n]
+    swap2 
+    mul                 // [r**n*sin(x),r**n*cos(x)]
+    [X3]                // [1e18,r**n*sin(x),r**n*cos(x)]
+    dup1                // [1e18,1e18,r**n*sin(x),r**n*cos(x)]
+    swap2               // 
+    sdiv                // [r**n*sin(x)/1e18 , 1e18 , r**n*cos(x)]
+    swap2 
+    sdiv                //[r**n*cos(x)/1e18,r**n*sin(x)/1e18]
 
-// #define macro POW() = takes(3) returns(2) {
-//    //INPUT STACK => [Re(a),Im(b),n]
-
-//     TO_POLAR()          // [r,T,n]
-//     swap1               // [T,r,n]
-//     dup3                // [n,T,r,n]
-//     mul                 // [n*T,r,n]
-//     [X3]                // [1e18,n*T,r,n]
-//     swap1               // [n*T,1e18,r,n]
-//     sdiv                // [n*T/1e18,r,n]
-//     swap2               // [n,r,n*T/1e18]
-//     swap1               // [r,n,n*T/1e18]
-//     exp                 // [r**n,n*T/1e18] 
-//     swap1               // [n*T/1e18,r**n]
-//     dup1                // [n*T/1e18,n*T/1e18,r**n] , Let n*T/1e18 = x
-//     SIN()               // [sin(x),x,r**n]
-//     swap1               // [x,sin(x),r**n]
-//     COS()               // [cos(x),sin(x),r**n]
-//     dup3                // [r**n,cos(x),sin(x),r**n]
-//     mul                 // [r**n*cos(x),sin(x),r**n]
-//     swap2 
-//     mul                 // [r**n*sin(x),r**n*cos(x)]
-//     [X3]                // [1e18,r**n*sin(x),r**n*cos(x)]
-//     dup1                // [1e18,1e18,r**n*sin(x),r**n*cos(x)]
-//     swap2               // 
-//     sdiv                // [r**n*sin(x)/1e18 , 1e18 , r**n*cos(x)]
-//     swap2 
-//     sdiv                //[r**n*cos(x)/1e18,r**n*sin(x)/1e18]
-// }
-
+}
