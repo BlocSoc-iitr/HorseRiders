@@ -360,10 +360,6 @@
     swap1                 // [X5*x,1e18,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
     sdiv                  // [X5*x/1e18,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
     sub                   // [X5*x/1e18-((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
-    // Testing some thing
-    [X3]                  // [1e18,X5*x/1e18-((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
-    swap1                 // [X5*x/1e18-((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18,1e18]
-    pop                   // [1e18]
 }
 
 #define macro LN() = takes(2) returns(1) {

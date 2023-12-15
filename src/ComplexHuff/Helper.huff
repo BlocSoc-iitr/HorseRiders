@@ -69,6 +69,9 @@
     P_ATAN2_INNER_T() // [T]
     PUT_C1()          // [c1,T]
     add               // [c1+T]
+    0x01
+    finish
+    jumpi
 
     diff_case:        // [x,y] and x<0 condition
     swap1             // [y,x]
@@ -84,6 +87,7 @@
     P_ATAN2_INNER_T() // [T]
     PUT_C2()          // [c2,T]
     add               // [c2+T]
+    finish:
 } 
 
 #define macro P_ATAN2_INNER_T() = takes(1) returns(1){
