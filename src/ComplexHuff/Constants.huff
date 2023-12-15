@@ -6,6 +6,7 @@
 #define constant X11 = 0xE8D4A51000              // 1e12
 #define constant X12 = 0xE47469D8BC6E            // 1e(18*4/5)
 #define constant X4 = 0x9C2007651B2500000        // 180e18
+#define constant X5 = 0xAE4E15744AE8000        // 7.85e17
 #define constant e = 0x25B946EBC0B36173          // euler's number
 #define constant PI_QUARTER = 0xAE4E15744AE8000          // 7.851e17
 #define constant X6 = 0x365595A8089C000          // 2.447e17

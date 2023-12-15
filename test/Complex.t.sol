@@ -78,6 +78,16 @@ contract ComplexTest is Test {
         assertApproxEqAbs(r, -5 * scale, 5e17); // 5e17 i.e. roundoff precision upto whole no. (precision might inc if calcR is optimized)
         assertApproxEqAbs(i, 12 * scale, 1e17); // precision : upto 1 decimal point
     }
+
+    function testAtan2() public {
+        int256 r = complex.p_atan2(4 * scale, 3 * scale);
+        assertEq((r * 100) / scale, 6124);
+    }
+
+    function testAtan1to1() public {
+        int256 r = complex.atan1to1(9 * 1e17);
+        assertEq((r * 100) / scale, 73);
+    }
 }
 
 interface WRAPPER {
@@ -95,9 +105,9 @@ interface WRAPPER {
 
     function fromPolar(int256, int256) external returns (int256, int256);
 
-    // function p_atan2(int256, int256) external returns (int256);
+    function p_atan2(int256, int256) external returns (int256);
 
-    // function atan1to1(int256) external returns (int256);
+    function atan1to1(int256) external returns (int256);
 
     function ln(int256, int256) external returns (int256, int256);
 
