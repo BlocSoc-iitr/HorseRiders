@@ -43,10 +43,10 @@
     //INPUT STACK => [RE(a),RE(b),IM(a),IM(b)]
 
     0x02             // [2,Re(A),Re(B),Im(A),Im(B)]
-    dup2             // [Re(B),2,Re(A),Re(B),Im(A),Im(B)]
+    dup3             // [Re(B),2,Re(A),Re(B),Im(A),Im(B)]
     exp              // [Re(B)**2 ,Re(A),Re(B),Im(A),Im(B)]
     0x02             // [2,Re(B)**2 ,Re(A),Re(B),Im(A),Im(B)]
-    dup5             // [Im(B),2,Re(B)**2,Re(A),Re(B),Im(A),Im(B)]
+    dup6             // [Im(B),2,Re(B)**2,Re(A),Re(B),Im(A),Im(B)]
     exp              // [Im(B)**2,Re(B)**2,Re(A),Re(B),Im(A),Im(B)]
     add              // [Im(B)**2+Re(B)**2,Re(A),Re(B),Im(A),Im(B)] , Let Im(B)**2+Re(B)**2 be X
     swap4            // [Im(B),Re(A),Re(B),Im(A),X]
@@ -252,55 +252,60 @@
     0x40 0x00 return
 }
 
-// #define macro P_ATAN2() = takes(2) returns(1) {
-//    // INPUT STACK => [y,x]
+#define macro P_ATAN2() = takes(2) returns(1) {
+    // INPUT STACK => [y,x]
 
-//    dup1                   // [y,y,x]
-//    swap2                  // [x,y,y]
-//    P_ATAN2_INNER_CALC()   // [T,y]
-//    swap1                  // [y,T]
-//    0x00                   // [0,y,T]
-//    sgt                    // [0>y,T]
-//    case3
-//    jumpi 
+    dup1                   // [y,y,x]
+    swap2                  // [x,y,y]
+    P_ATAN2_INNER_CALC()   // [T,y]
+    swap1                  // [y,T]
+    0x00                   // [0,y,T]
+    sgt                    // [0>y,T]
+    case3
+    jumpi
+    0x01                   // [1,T]
+    finish
+    jumpi
 
-//    case3:
-//    PUT_NEG1()             // [-1,T]
-//    mul                    // [-T] 
-   
-// }
 
-// #define macro ATAN1TO1() = takes(1) returns(1){
-//  // INPUT STACK => [x]
+    case3:
+    PUT_NEG1()             // [-1,T]
+    mul                    // [-T] 
 
-//  [X7]                  // [X7,x]
-//  dup1                  // [x,X7,x]
-//  mul                   // [x*X7,x]
-//  [X3]                  // [1e18,x*X7,x]
-//  swap1                 // [x*X7,1e18,x]
-//  sdiv                  // [x*X7/1e18,x]
-//  [X6]                  // [X6,x*X7/1e18,x]
-//  add                   // [X6+x*X7/1e18,x]
-//  [X3]                  // [1e18,X6+x*X7/1e18,x]
-//  dup3                  // [x,1e18,X6+x*X7/1e18,x]
-//  sub                   // [x-1e18,X6+x*X7/1e18,x]
-//  dup3                  // [x,x-1e18,X6+x*X7/1e18,x]
-//  mul                   // [x*(x-1e18),X6+x*X7/1e18,x]
-//  [X3]                  // [1e18,x*(x-1e18),X6+x*X7/1e18,x]
-//  swap1                 // [x*(x-1e18),1e18,X6+x*X7/1e18,x]
-//  sdiv                  // [x*(x-1e18)/1e18,X6+x*X7/1e18,x]
-//  mul                   // [(x*(x-1e18)/1e18)*(X6+x*X7/1e18),x]
-//  swap1                 // [x,(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  [X5]                  // [X5,x,(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  mul                   // [X5*x,(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  [X3]                  // [1e18,X5*x,(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  swap1                 // [X5*x,1e18,(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  sdiv                  // [X5*x/1e18,(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  sub                   // [X5*x/1e18-(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  [X3]                  // [1e18,X5*x/1e18-(x*(x-1e18)/1e18)*(X6+x*X7/1e18)]
-//  swap1                 // [X5*x/1e18-(x*(x-1e18)/1e18)*(X6+x*X7/1e18),1e18]
-//  sdiv                  // [X5*x/1e18-(x*(x-1e18)/1e18)*(X6+x*X7/1e18)/1e18]
-// }
+    finish:                 // [Appropriate T]
+}
+
+#define macro ATAN1TO1() = takes(1) returns(1){
+    // INPUT STACK => [x]
+
+    [X7]                  // [X7,x]
+    dup2                  // [x,X7,x]
+    mul                   // [x*X7,x]
+    [X3]                  // [1e18,x*X7,x]
+    swap1                 // [x*X7,1e18,x]
+    sdiv                  // [x*X7/1e18,x]
+    [X6]                  // [X6,x*X7/1e18,x]
+    add                   // [X6+x*X7/1e18,x]
+    [X3]                  // [1e18,X6+x*X7/1e18,x]
+    dup3                  // [x,1e18,X6+x*X7/1e18,x]
+    sub                   // [x-1e18,X6+x*X7/1e18,x]
+    dup3                  // [x,x-1e18,X6+x*X7/1e18,x]
+    mul                   // [x*(x-1e18),X6+x*X7/1e18,x]
+    [X3]                  // [1e18,x*(x-1e18),X6+x*X7/1e18,x]
+    swap1                 // [x*(x-1e18),1e18,X6+x*X7/1e18,x]
+    sdiv                  // [x*(x-1e18)/1e18,X6+x*X7/1e18,x]
+    mul                   // [(x*(x-1e18)/1e18)*(X6+x*X7/1e18),x]
+    [X3]                  // [1e18,(x*(x-1e18)/1e18)*(X6+x*X7/1e18),x]
+    swap1                 // [(x*(x-1e18)/1e18)*(X6+x*X7/1e18),1e18,x]
+    sdiv                  // [((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18,x]
+    swap1                 // [x,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+    [X5]                  // [X5,x,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+    mul                   // [X5*x,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+    [X3]                  // [1e18,X5*x,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+    swap1                 // [X5*x,1e18,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+    sdiv                  // [X5*x/1e18,((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+    sub                   // [X5*x/1e18-((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
+}
 
 #define macro LN() = takes(2) returns(1) {
    //INPUT STACK => [Re(A),Im(A)]

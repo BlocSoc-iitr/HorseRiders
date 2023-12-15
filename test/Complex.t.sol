@@ -34,8 +34,8 @@ contract ComplexTest is Test {
 
     function testDivZ() public {
         (int256 r, int256 i) = complex.divz(7 * scale, 1 * scale, 5 * scale, 2 * scale);
-        assertEq((r * 10) / scale, 34); // 17/5
-        assertEq((i * 10) / scale, -18); // -8/5
+        assertEq((r * 10) / scale, 2); // 17/74
+        assertEq((i * 10) / scale, -1); // -8/74
     }
 
     function testCalcR() public {
@@ -78,6 +78,16 @@ contract ComplexTest is Test {
         assertEq(r * 100 / scale, 391); // ln(50) = 3.912..
         assertEq(i * 100 / scale, 65);
     }
+
+    function testAtan2() public {
+        int256 r = complex.p_atan2(4 * scale, 3 * scale);
+        assertEq((r * 100) / scale, 6124);
+    }
+
+    function testAtan1to1() public {
+        int256 r = complex.atan1to1(9 * 1e17);
+        assertEq((r * 100) / scale, 73);
+    }
 }
 
 interface WRAPPER {
@@ -95,9 +105,9 @@ interface WRAPPER {
 
     function fromPolar(int256, int256) external returns (int256, int256);
 
-    // function p_atan2(int256, int256) external returns (int256);
+    function p_atan2(int256, int256) external returns (int256);
 
-    // function atan1to1(int256) external returns (int256);
+    function atan1to1(int256) external returns (int256);
 
     function ln(int256, int256) external returns (int256, int256);
 

@@ -7,8 +7,8 @@
 #define function calcR(int256,int256) view returns (uint256)
 #define function toPolar(int256,int256) view returns (int256,int256)
 #define function fromPolar(int256,int256) view returns (int256,int256)
-// #define function p_atan2(int256 , int256) returns (int256)
-// #define function atan1to1(int256 ) returns (int256)
+#define function p_atan2(int256 , int256) view returns (int256)
+#define function atan1to1(int256) view returns (int256)
 #define function ln(int256,int256) view returns (int256,int256)
 #define function sqrt(int256,int256) view returns (int256,int256)
 #define function expZ(int256,int256) view returns (int256,int256)
@@ -94,22 +94,22 @@
     FROM_POLAR()
 }
 
-// #define macro P_ATAN2_LOCAL() = takes(0) returns(0){
-//     0x04 calldataload
-//     0x24 calldataload
-//     P_ATAN2()
-//     0x00 mstore
-//     0x20 0x00 return
+#define macro P_ATAN2_LOCAL() = takes(0) returns(0){
+    0x04 calldataload
+    0x24 calldataload
+    P_ATAN2()
+    0x00 mstore
+    0x20 0x00 return
 
-// }
+}
 
-// #define macro ATAN1TO1_LOCAL() = takes(0) returns(0){
-//     0x04 calldataload
-//     ATAN1TO1()
-//     0x00 mstore
-//     0x20 0x00 return
+#define macro ATAN1TO1_LOCAL() = takes(0) returns(0){
+    0x04 calldataload
+    ATAN1TO1()
+    0x00 mstore
+    0x20 0x00 return
 
-// }
+}
 
 #define macro LN_LOCAL() = takes(0) returns(0){
     0x04 calldataload
@@ -159,8 +159,8 @@
     dup1 __FUNC_SIG(calcR) eq calc_R jumpi
     dup1 __FUNC_SIG(toPolar) eq to_Polar jumpi
     dup1 __FUNC_SIG(fromPolar) eq from_Polar jumpi
-//    dup1 __FUNC_SIG(p_atan2) eq p_atan2 jumpi
-//    dup1 __FUNC_SIG(atan1to1) eq atan1to1 jumpi
+    dup1 __FUNC_SIG(p_atan2) eq p__atan2 jumpi
+    dup1 __FUNC_SIG(atan1to1) eq a_tan1to1 jumpi
     dup1 __FUNC_SIG(ln) eq ln_Z jumpi
     dup1 __FUNC_SIG(sqrt) eq sqrt_jump jumpi 
     dup1 __FUNC_SIG(expZ) eq exp_Z jumpi
@@ -189,11 +189,11 @@
     from_Polar:
     FROM_POLAR_LOCAL()
 
-    // p_atan2:
-    // P_ATAN2_LOCAL()
+    p__atan2:
+    P_ATAN2_LOCAL()
 
-    // atan1to1:
-    // ATAN1TO1_LOCAL()
+    a_tan1to1:
+    ATAN1TO1_LOCAL()
 
     ln_Z:
     LN_LOCAL()
