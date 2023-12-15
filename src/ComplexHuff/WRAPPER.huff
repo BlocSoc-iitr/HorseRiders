@@ -161,8 +161,8 @@
     dup1 __FUNC_SIG(calcR) eq calc_R jumpi
     dup1 __FUNC_SIG(toPolar) eq to_Polar jumpi
     dup1 __FUNC_SIG(fromPolar) eq from_Polar jumpi
-    dup1 __FUNC_SIG(p_atan2) eq p_atan2 jumpi
-    // dup1 __FUNC_SIG(atan1to1) eq atan1to1 jumpi
+    dup1 __FUNC_SIG(p_atan2) eq p__atan2 jumpi
+    // dup1 __FUNC_SIG(atan1to1) eq a_tan1to1 jumpi
     dup1 __FUNC_SIG(ln) eq ln_Z jumpi
     dup1 __FUNC_SIG(sqrt) eq sqrt_jump jumpi 
     dup1 __FUNC_SIG(expZ) eq exp_Z jumpi
@@ -191,10 +191,10 @@
     from_Polar:
     FROM_POLAR_LOCAL()
 
-    p_atan2:
+    p__atan2:
     P_ATAN2_LOCAL()
 
-    // atan1to1:
+    // a_tan1to1:
     // ATAN1TO1_LOCAL()
 
     ln_Z:
