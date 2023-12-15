@@ -15,32 +15,52 @@ contract ComplexTest is Test {
     }
 
     function testSubZ() public {
-        (int256 r, int256 i) = complex.subz(4 * scale, 5 * scale, 8 * scale, 11 * scale);
+        (int256 r, int256 i) = complex.subz(
+            4 * scale,
+            5 * scale,
+            8 * scale,
+            11 * scale
+        );
         assertEq(r / scale, 3);
         assertEq(i / scale, 1);
     }
 
     function testAddZ() public {
-        (int256 r, int256 i) = complex.addz(2 * scale, 3 * scale, 4 * scale, 5 * scale);
+        (int256 r, int256 i) = complex.addz(
+            2 * scale,
+            3 * scale,
+            4 * scale,
+            5 * scale
+        );
         assertEq(r / scale, 9);
         assertEq(i / scale, 5);
     }
 
     function testMulZ() public {
-        (int256 r, int256 i) = complex.mulz(2 * scale, 3 * scale, 4 * scale, 5 * scale);
+        (int256 r, int256 i) = complex.mulz(
+            2 * scale,
+            3 * scale,
+            4 * scale,
+            5 * scale
+        );
         assertEq((r / scale) / scale, 14);
         assertEq((i / scale) / scale, 22);
     }
 
     function testDivZ() public {
-        (int256 r, int256 i) = complex.divz(7 * scale, 1 * scale, 5 * scale, 2 * scale);
+        (int256 r, int256 i) = complex.divz(
+            7 * scale,
+            1 * scale,
+            5 * scale,
+            2 * scale
+        );
         assertEq((r * 10) / scale, 34); // 17/5
         assertEq((i * 10) / scale, -18); // -8/5
     }
 
     function testCalcR() public {
         uint256 r = complex.calcR(4, 4);
-        assertEq(r * 100 / uint256(scale), 565);
+        assertEq((r * 100) / uint256(scale), 565);
     }
 
     function testToPolar() public {
@@ -69,8 +89,8 @@ contract ComplexTest is Test {
 
     function testLnZ() public {
         (int256 r, int256 i) = complex.ln(30, 40);
-        assertEq(r * 100 / scale, 391); // ln(50) = 3.912..
-        assertEq(i * 100 / scale, 65);
+        assertEq((r * 100) / scale, 391); // ln(50) = 3.912..
+        assertEq((i * 100) / scale, 65);
     }
 
     function testPowZ() public {
@@ -80,24 +100,44 @@ contract ComplexTest is Test {
     }
 
     function testAtan2() public {
-        int256 r = complex.p_atan2(4*scale, 3*scale);
-        assertEq(r * 100 / scale, 6124);
+        int256 r = complex.p_atan2(4 * scale, 3 * scale);
+        assertEq((r * 100) / scale, 6124);
     }
 
     function testAtan1to1() public {
         int256 r = complex.atan1to1(9 * 1e17);
-        assertEq(r * 100 / scale, 73);
+        assertEq((r * 100) / scale, 73);
     }
 }
 
 interface WRAPPER {
-    function subz(int256, int256, int256, int256) external returns (int256, int256);
+    function subz(
+        int256,
+        int256,
+        int256,
+        int256
+    ) external returns (int256, int256);
 
-    function addz(int256, int256, int256, int256) external returns (int256, int256);
+    function addz(
+        int256,
+        int256,
+        int256,
+        int256
+    ) external returns (int256, int256);
 
-    function mulz(int256, int256, int256, int256) external returns (int256, int256);
+    function mulz(
+        int256,
+        int256,
+        int256,
+        int256
+    ) external returns (int256, int256);
 
-    function divz(int256, int256, int256, int256) external returns (int256, int256);
+    function divz(
+        int256,
+        int256,
+        int256,
+        int256
+    ) external returns (int256, int256);
 
     function calcR(int256, int256) external returns (uint256);
 
