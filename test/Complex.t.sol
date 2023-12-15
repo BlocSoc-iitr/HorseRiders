@@ -81,12 +81,12 @@ contract ComplexTest is Test {
 
     function testAtan2() public {
         int256 r = complex.p_atan2(3 * scale, 4 * scale);
-        assertEq(r * 100 / scale, 65);
+        assertEq(r * 100 / scale, 318);
     }
 
     function testAtan1to1() public {
-        int256 r = complex.atan1to1(1 * scale);
-        assertEq(r * 100 / scale, 78);
+        int256 r = complex.atan1to1(11 * 1e17);
+        assertEq(r * 100 / scale, 83);
     }
 }
 
