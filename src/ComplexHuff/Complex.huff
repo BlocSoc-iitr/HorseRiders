@@ -5,7 +5,7 @@
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
 
-#define macro ADD_Z() = takes (0) returns (0) {
+#define macro ADD_Z() = takes (4) returns (0) {
     add              // [Re(A)+Re(B),Im(A),Im(B)]
     swap2            // [Im(B),Im(A),Re(A)+Re(B)]
     add              // [Im(B)+Im(A),Re(A)+Re(B)]
@@ -225,7 +225,7 @@
     swap2            // [r,cos(T),-sin(-T)*r/1e18]
     mul              // [r*cos(T),-sin(-T)*r/1e18]
     [X3]             // [1e18,r*cos(T),-sin(-T)*r/1e18]
-    swap1            // [r*cos(T),1e18,-sin(-T)*r/1e18]]
+    swap1            // [r*cos(T),1e18,-sin(-T)*r/1e18]
     sdiv             // [r*cos(T)/1e18,-sin(-T)*r/1e18]
     0x00 mstore
     0x20 mstore
@@ -393,4 +393,46 @@
     swap2 
     sdiv                //[r**n*cos(x)/1e18,r**n*sin(x)/1e18]
 
+}
+// to rotate a complex number by any angle 
+#define macro rotateComplex() = takes(3) returns(2) {
+    // INPUT STACK => [Re(A), Im(A), angle]
+
+    dup1                  // [Re(A), Re(A), Im(A), angle]
+    swap2                 // [Im(A), Re(A), Re(A), angle]
+    TO_POLAR()            // [r, theta]
+    swap1                // [theta, r]
+    
+    // Add the rotation angle
+    add                   // [theta + angle, r]
+    
+    FROM_POLAR()          // [Re(A) after rotation, Im(A) after rotation]
+}
+
+// to find the the equation of a line passing through two complex numbers 
+#define macro LINE_EQUATION() = takes(4) returns(2) {
+    // INPUT STACK => [Re(a), Im(a), Re(b), Im(b)]
+
+    // Calculate slope (m)
+    dup2                   // [Re(a), Im(a), Re(b), Im(b), Re(a)]
+    swap3                  // [Re(b), Im(b), Re(a), Im(b), Re(a)]
+    dup2
+    swap2                  // [Re(b), Im(b), Re(b), Im(b), Re(a), Re(a)]
+    sub                    // [Re(b) - Re(a), Im(b), Re(b), Im(b), Re(a)]
+    swap1
+    dup3
+    swap2                  // [Im(b), Re(b) - Re(a), Im(b), Re(b), Re(a)]
+    sub                    // [Im(b) - Im(a), Re(b) - Re(a), Im(b), Re(b), Re(a)]
+    DIV_Z()                // [(Im(b) - Im(a)) / (Re(b) - Re(a)), Re(b), Im(b), Re(a)]
+
+    // Calculate y-intercept (c)
+    swap2                  // [Im(b), Im(b) - Im(a), Re(b), (Im(b) - Im(a)) / (Re(b) - Re(a)), Re(a)]
+    MUL_Z()                // [Im(b) * (Im(b) - Im(a)) / (Re(b) - Re(a)), (Im(b) - Im(a)) / (Re(b) - Re(a)), Re(b), Re(a)]
+    swap1
+    sub                    // [(Im(b) * (Im(b) - Im(a)) / (Re(b) - Re(a))) - Re(a), (Im(b) - Im(a)) / (Re(b) - Re(a)), Re(b)]
+    swap2
+    swap1                  // [(Im(b) - Im(a)) / (Re(b) - Re(a)), (Im(b) * (Im(b) - Im(a)) / (Re(b) - Re(a))) - Re(a), Re(b)]
+    MUL_Z()                // [m, c]
+
+    // Result is on the stack [m, c]
 }
