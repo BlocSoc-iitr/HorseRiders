@@ -1,68 +1,66 @@
-# HorseRiders 🏇🏇🏇
-### Fast Fourier Transformation Implementation and a Complex Maths Library written in Huff
+## Foundry
 
-HorseRiders is a complex math library implemenation written in huff. It includes 
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-1. Fast Fourier Transform
-2. Complex Numbers Math Library
-3. Implementation of PRBMath in huff
+Foundry consists of:
 
-Fast Fourier Transform is an algorithm to calcualte the discrete fourier transform of a given set of inputs. It computes the output in O(nlogn) time complexity instead of n^2 which is the case with DFT.
+-   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+-   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+-   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+-   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-In this Library you can find the following functions : 
+## Documentation
 
-```s
-addZ --> Addition Operation
-subZ --> Subtraction Operation
-mulZ --> Multiplication Operation
-divZ --> Division Operation
-calcR --> Amplitude of a complex number
-toPolar --> convert cartisian into Polar 
-fromPolar --> Convert Polar to cartesian
-p_atan2 --> Calculate arctan(x/y)
-atan1to1 --> calculate arctan(x/y) in a gas efficient way in the range of -1 to 1
-ln --> calculate natural logarithm 
-sqrt --> calculate sqrt of complex number
-expZ --> calculate exponential of complex number
-pow --> calculate complex number raised to some power
+https://book.getfoundry.sh/
+
+## Usage
+
+### Build
+
+```shell
+$ forge build
 ```
 
-## Example
+### Test
 
-Let us the take the following sample points
-
-```cpp
-cd(0, 0), cd(1, 1), cd(3, 3), cd(4, 4), cd(4, 4), cd(3, 3), cd(1, 1), cd(0, 0)
+```shell
+$ forge test
 ```
 
-For these points the following output is observed whcih represents the amplitude of the corresponding frequency buckets. 
+### Format
 
-```
-(16,16) (-4.82843,-11.6569) (0,0) (-0.343146,0.828427) (0,0) (0.828427,-0.343146) (0,0) (-11.6569,-4.82843)
-```
-
-which is the correct output as seen in this matplotlib plot as shown here 
-
-<img src="assets/asset.png" width="700" height="400"></img>
-
-and the result is shown here 
-
-```
-[ 16.        +16.j          -4.82842712-11.65685425j
-   0.         +0.j          -0.34314575 +0.82842712j
-   0.         +0.j           0.82842712 -0.34314575j
-   0.         +0.j         -11.65685425 -4.82842712j]
-[ 0.     0.125  0.25   0.375 -0.5   -0.375 -0.25  -0.125]
+```shell
+$ forge fmt
 ```
 
-which is the correct result !
+### Gas Snapshots
 
-Here is its implementation by one of our team members --> https://github.com/0xpanicError/solidityFFT
+```shell
+$ forge snapshot
+```
 
-### Credits
+### Anvil
 
-This Project was made by three University Students
+```shell
+$ anvil
+```
 
-1. Yash Saraswat | [panic](https://www.twitter.com/0xpanicError)
-2. Shourya Goel | [shogo](https://twitter.com/ShogLoFi)
-3. Prabhat Verma | [PROBOT](https://twitter.com/pr0b0t1sc00l)
+### Deploy
+
+```shell
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+
+### Cast
+
+```shell
+$ cast <subcommand>
+```
+
+### Help
+
+```shell
+$ forge --help
+$ anvil --help
+$ cast --help
+```

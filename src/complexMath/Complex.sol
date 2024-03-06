@@ -276,4 +276,29 @@ contract Num_Complex {
 
         return a;
     }
+
+    /// @notice COMPLEX RotatesComplexNumber
+    /// @param a Complex number
+    /// @param T Theta
+    /// @return Complex number
+    function rotateComplex(Complex memory a, int256 T) public pure returns(Complex memory){
+        (int256 r, int256 _T) = toPolar(a);
+        _T = _T + T;
+        a = fromPolar(r,_T);
+        return a;
+    }
+
+     /// @notice COMPLEX equationofaline
+    /// @param a Complex number
+    /// @param a Complex number
+    /// @return int slope 
+    /// @return int intercept
+    function  LINE_EQUATION(Complex memory a, Complex memory b) public pure returns(int256,int256){
+        int256 slnum = b.im - a.im;
+        int256 sldno = b.re - a.re;
+        int256 slope = (1e18*slnum) / (sldno) ;
+        int256 intercept = (1e18*b.im - slope*b.re)  ;
+
+        return(slope,intercept);
+    }
 }

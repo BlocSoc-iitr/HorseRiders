@@ -88,6 +88,18 @@ contract ComplexTest is Test {
         int256 r = complex.atan1to1(9 * 1e17);
         assertEq((r * 100) / scale, 73);
     }
+
+    function testrotateComplex() public{
+        (int256 r,int256 i) = complex.rotateComplex(2*scale, 2*scale, 90);
+        assertEq(r / scale , -2);
+        assertEq(i / scale, 2);
+    }
+
+    function testLINE_EQUATION() public{
+        (int256 m , int256 c)=complex.LINE_EQUATION(1*scale, 1*scale, -1*scale, 3*scale);
+        assertEq(m / scale , -1);
+        assertEq(m / scale, 2);
+    }
 }
 
 interface WRAPPER {

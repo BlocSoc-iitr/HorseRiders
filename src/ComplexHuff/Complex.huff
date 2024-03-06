@@ -5,7 +5,7 @@
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
 
-#define macro ADD_Z() = takes (0) returns (0) {
+#define macro ADD_Z() = takes (4) returns (2) {
     add              // [Re(A)+Re(B),Im(A),Im(B)]
     swap2            // [Im(B),Im(A),Re(A)+Re(B)]
     add              // [Im(B)+Im(A),Re(A)+Re(B)]
@@ -393,4 +393,39 @@
     swap2 
     sdiv                //[r**n*cos(x)/1e18,r**n*sin(x)/1e18]
 
+}
+
+// to rotate a complex number by any angle 
+#define macro rotateComplex() = takes(3) returns(2) {
+    // INPUT STACK => [Re(A), Im(A), angle]
+
+    TO_POLAR()            // [r, theta,angle]
+    swap2                // [angle,theta,r]   
+
+    // Add the rotation angle
+    add                   // [theta + angle, r]
+
+    FROM_POLAR()          // [Re(A) after rotation, Im(A) after rotation]
+}
+
+// to find the the equation of a line passing through two complex numbers 
+#define macro LINE_EQUATION() = takes(4) returns(2) {
+    // INPUT STACK => [Re(a), Im(a), Re(b), Im(b)]
+    dup3            //[rb,ra,ia,rb,ib]
+    sub             //[rb-ra,ia,rb,ib]
+    swap1           //[ia,rb-ra,rb,ib]
+    dup4            //[ib,ia,rb-ra,rb,ib]
+    sub             //[ib-ia,rb-ra,rb,ib]
+    [X3]            //[1e18,ib-ia,rb-ra,rb,ib]
+    mul             //[1e18*ib-ia,rb-ra,rb,ib]
+    sdiv            //[1e18*(ib-ia)/rb-ra,rb,ib]
+    dup1            //[m,m,rb,ib]
+    swap2           //[rb,m,m,ib]
+    mul             //[rb*m,m,ib]
+    swap1           //[m,rb*m,ib]
+    swap2           //[ib,rb*m,m]
+    [X3]            //[1e18,ib,rb*m,m]
+    mul             //[1e18*ib,rb*m,m]
+    sub             //[1e18*ib-rb*m,m]
+    swap1           //[m,c]
 }
