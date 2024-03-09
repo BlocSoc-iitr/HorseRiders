@@ -5,7 +5,7 @@
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
 
-#define macro ADD_Z() = takes (0) returns (0) {
+#define macro ADD_Z() = takes (4) returns (2) {
     add              // [Re(A)+Re(B),Im(A),Im(B)]
     swap2            // [Im(B),Im(A),Re(A)+Re(B)]
     add              // [Im(B)+Im(A),Re(A)+Re(B)]

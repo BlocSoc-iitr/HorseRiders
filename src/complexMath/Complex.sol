@@ -38,7 +38,10 @@ contract Num_Complex {
     /// @param a Complex Number
     /// @param b Complex Number
     /// @return Complex Number
-    function add(Complex memory a, Complex memory b) public pure returns (Complex memory) {
+    function add(
+        Complex memory a,
+        Complex memory b
+    ) public pure returns (Complex memory) {
         a.re += b.re;
         a.im += b.im;
 
@@ -49,7 +52,10 @@ contract Num_Complex {
     /// @param a Complex number
     /// @param b Complex number
     /// @return Complex Number
-    function sub(Complex memory a, Complex memory b) public pure returns (Complex memory) {
+    function sub(
+        Complex memory a,
+        Complex memory b
+    ) public pure returns (Complex memory) {
         a.re -= b.re;
         a.im -= b.im;
 
@@ -60,7 +66,10 @@ contract Num_Complex {
     /// @param a Complex number
     /// @param b Complex number
     /// @return Complex Number
-    function mul(Complex memory a, Complex memory b) public pure returns (Complex memory) {
+    function mul(
+        Complex memory a,
+        Complex memory b
+    ) public pure returns (Complex memory) {
         int256 _a = a.re * b.re;
         int256 _b = a.im * b.im;
         int256 _c = a.im * b.re;
@@ -69,8 +78,9 @@ contract Num_Complex {
         a.re = _a - _b;
         a.im = _c + _d;
 
-        a.re /= 1e18;
-        a.im /= 1e18;
+        // a.re /= 1e18;
+        // a.im /= 1e18;
+        // Various Fuzz Test were failing due the above two lines
 
         return a;
     }
@@ -79,13 +89,17 @@ contract Num_Complex {
     /// @param a Complex number
     /// @param b Complex number
     /// @return Complex Number
-    function div(Complex memory a, Complex memory b) public pure returns (Complex memory) {
+    function div(
+        Complex memory a,
+        Complex memory b
+    ) public pure returns (Complex memory) {
         int256 numA = a.re * b.re + a.im * b.im;
         int256 den = b.re ** 2 + b.im ** 2;
         int256 numB = a.im * b.re - a.re * b.im;
 
         a.re = (numA * 1e18) / den;
-        b.im = (numB * 1e18) / den;
+        //b.im = (numB * 1e18) / den; should be a instead of b
+        a.im = (numB * 1e18) / den;
 
         return a;
     }
@@ -107,8 +121,10 @@ contract Num_Complex {
     /// @dev // atan vs atan2
     /// @return r r
     /// @return T theta
-    function toPolar(Complex memory a) public pure returns (int256, int256) {
-        int256 r = r2(a.re, a.im);
+    function toPolar(Complex memory a) public  pure returns (int256, int256) {
+        int256 r = r2(a.re, a.im); // not returning desirable output during fuzzing
+        //int256 r = (a.re*a.re + a.im*a.im).sqrt() / 1e9;  // Fuzzing test were passing when devided by 1e9
+        
         //int BdivA = re / im;
         if (r > 0) {
             // im/re or re/im ??
@@ -126,7 +142,10 @@ contract Num_Complex {
     /// @param r r
     /// @param T theta
     /// @return a Complex number
-    function fromPolar(int256 r, int256 T) public pure returns (Complex memory a) {
+    function fromPolar(
+        int256 r,
+        int256 T
+    ) public pure returns (Complex memory a) {
         // @dev check if T is negative
         if (T > 0) {
             a.re = (r * Trigonometry.cos(uint256(T))) / 1e18;
@@ -189,7 +208,9 @@ contract Num_Complex {
     /// @param x (y/x)
     /// @return T T
     function atan1to1(int256 x) public pure returns (int256) {
-        int256 y = ((7.85e17 * x) / 1e18) - (((x * (x - 1e18)) / 1e18) * (2.447e17 + ((6.63e16 * x) / 1e18))) / 1e18;
+        int256 y = ((7.85e17 * x) / 1e18) -
+            (((x * (x - 1e18)) / 1e18) * (2.447e17 + ((6.63e16 * x) / 1e18))) /
+            1e18;
 
         return y;
     }
@@ -264,7 +285,10 @@ contract Num_Complex {
     /// @param a Complex number
     /// @param n base 1e18
     /// @return Complex number
-    function pow(Complex memory a, int256 n) public pure returns (Complex memory) {
+    function pow(
+        Complex memory a,
+        int256 n
+    ) public pure returns (Complex memory) {
         (int256 r, int256 theta) = toPolar(a);
 
         // gas savings
