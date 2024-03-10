@@ -687,9 +687,4 @@ library PRBMathSD59x18 {
         }
     }
 
-    function p_atan2(int256 y, int256 x) internal pure returns (int256 result){
-        unchecked{
-            result = int256(PRBMath.p_atan2(y,x));
-        }
-    }
 }
