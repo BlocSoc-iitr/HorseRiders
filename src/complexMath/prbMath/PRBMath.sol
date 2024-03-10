@@ -638,4 +638,24 @@ library PRBMath {
             return result >= roundedDownResult ? roundedDownResult : result;
         }
     }
+
+    function p_atan2(int256 y, int256 x) internal pure returns (int256 T) {
+        int256 c1 = 3141592653589793300 / 4;
+        int256 c2 = 3 * c1;
+        int256 abs_y = int(uint(y) + 1e8);
+
+        if (x >= 0) {
+            int256 r = ((x - abs_y) * 1e18) / (x + abs_y);
+            T = (1963e14 * r ** 3) / 1e54 - (9817e14 * r) / 1e18 + c1;
+        } else {
+            int256 r = ((x + abs_y) * 1e18) / (abs_y - x);
+            T = (1963e14 * r ** 3) / 1e54 - (9817e14 * r) / 1e18 + c2;
+        }
+        if (y < 0) {
+            return -T;
+        } else {
+            return T;
+        }
+    }
+
 }

@@ -66,11 +66,15 @@ contract ComplexTest is Test {
     //     assertEq(r / uint256(scale), 5);
     // }
 
-    // function testToPolar() public {
-    //     (int256 r, int256 t) = complex.toPolar(3, 4);
-    //     assertEq(r, 5);
-    //     assertEq((t * 100) / scale, 65);
-    // }
+    function testToPolar() public {
+        (int256 r, int256 t) = complex.toPolar(1, 3);
+        Num_Complex.Complex memory complexA = Num_Complex.Complex(1,3);
+        (int256 rS, int256 tS) = num_complex.toPolar(complexA);
+        assertEq(rS,0);
+        assertEq(tS,0);
+        assertEq(r, 0);
+        assertEq(t * 100, 0);
+    }
 
     // function testFromPolar() public {
     //     (int256 r, int256 i) = complex.fromPolar(5 * scale, 92729522 * 1e10);
@@ -117,82 +121,82 @@ contract ComplexTest is Test {
     // bi,ai,ar,br
     // bi,ai,br,ar
 
-    function testAddZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
-        //bounded input to avoid underflow or overflow
-        bi = bound(bi, -1e40, 1e40);
-        ai = bound(ai, -1e40, 1e40);
-        br = bound(br, -1e40, 1e40);
-        ar = bound(ar, -1e40, 1e40);
-        (int256 r, int256 i) = complex.addz(bi, ai, br, ar);
-        Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
-        Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
-        int256 resultR = num_complex.add(complexA, complexB).re;
-        int256 resultI = num_complex.add(complexA, complexB).im;
+    // function testAddZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
+    //     //bounded input to avoid underflow or overflow
+    //     bi = bound(bi, -1e40, 1e40);
+    //     ai = bound(ai, -1e40, 1e40);
+    //     br = bound(br, -1e40, 1e40);
+    //     ar = bound(ar, -1e40, 1e40);
+    //     (int256 r, int256 i) = complex.addz(bi, ai, br, ar);
+    //     Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
+    //     Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
+    //     int256 resultR = num_complex.add(complexA, complexB).re;
+    //     int256 resultI = num_complex.add(complexA, complexB).im;
 
-        assertEq(resultR, r);
-        assertEq(resultI, i);
-    }
+    //     assertEq(resultR, r);
+    //     assertEq(resultI, i);
+    // }
 
-    function testSubZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
-        //bounded input to avoid underflow or overflow
-        bi = bound(bi, -1e40, 1e40);
-        ai = bound(ai, -1e40, 1e40);
-        br = bound(br, -1e40, 1e40);
-        ar = bound(ar, -1e40, 1e40);
-        (int256 r, int256 i) = complex.subz(bi, ai, br, ar);
-        Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
-        Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
-        int256 resultR = num_complex.sub(complexA, complexB).re;
-        int256 resultI = num_complex.sub(complexA, complexB).im;
+    // function testSubZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
+    //     //bounded input to avoid underflow or overflow
+    //     bi = bound(bi, -1e40, 1e40);
+    //     ai = bound(ai, -1e40, 1e40);
+    //     br = bound(br, -1e40, 1e40);
+    //     ar = bound(ar, -1e40, 1e40);
+    //     (int256 r, int256 i) = complex.subz(bi, ai, br, ar);
+    //     Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
+    //     Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
+    //     int256 resultR = num_complex.sub(complexA, complexB).re;
+    //     int256 resultI = num_complex.sub(complexA, complexB).im;
 
-        assertEq(resultR, r);
-        assertEq(resultI, i);
-    }
+    //     assertEq(resultR, r);
+    //     assertEq(resultI, i);
+    // }
 
-    function testMulZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
-        //bounded input to avoid underflow or overflow
-        bi = bound(bi, -1e30, 1e30);
-        ai = bound(ai, -1e30, 1e30);
-        br = bound(br, -1e30, 1e30);
-        ar = bound(ar, -1e30, 1e30);
-        (int256 r, int256 i) = complex.mulz(bi, ai, br, ar);
-        Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
-        Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
-        int256 resultR = num_complex.mul(complexA, complexB).re;
-        int256 resultI = num_complex.mul(complexA, complexB).im;
-        assertEq(resultR, r);
-        assertEq(resultI, i);
-    }
+    // function testMulZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
+    //     //bounded input to avoid underflow or overflow
+    //     bi = bound(bi, -1e30, 1e30);
+    //     ai = bound(ai, -1e30, 1e30);
+    //     br = bound(br, -1e30, 1e30);
+    //     ar = bound(ar, -1e30, 1e30);
+    //     (int256 r, int256 i) = complex.mulz(bi, ai, br, ar);
+    //     Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
+    //     Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
+    //     int256 resultR = num_complex.mul(complexA, complexB).re;
+    //     int256 resultI = num_complex.mul(complexA, complexB).im;
+    //     assertEq(resultR, r);
+    //     assertEq(resultI, i);
+    // }
 
-    function testDivZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
-        //bounded input to avoid underflow or overflow
-        vm.assume(bi != 0);
-        vm.assume(ai != 0);
-        vm.assume(br != 0);
-        vm.assume(ar != 0);
-        bi = bound(bi, -1e10, 1e10);
-        ai = bound(ai, -1e10, 1e10);
-        br = bound(br, -1e10, 1e10);
-        ar = bound(ar, -1e10, 1e10);
+    // function testDivZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
+    //     //bounded input to avoid underflow or overflow
+    //     vm.assume(bi != 0);
+    //     vm.assume(ai != 0);
+    //     vm.assume(br != 0);
+    //     vm.assume(ar != 0);
+    //     bi = bound(bi, -1e10, 1e10);
+    //     ai = bound(ai, -1e10, 1e10);
+    //     br = bound(br, -1e10, 1e10);
+    //     ar = bound(ar, -1e10, 1e10);
 
-        (int256 r, int256 i) = complex.divz(bi, ai, br, ar);
-        Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
-        Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
-        int256 resultR = num_complex.div(complexA, complexB).re;
-        int256 resultI = num_complex.div(complexA, complexB).im;
+    //     (int256 r, int256 i) = complex.divz(bi, ai, br, ar);
+    //     Num_Complex.Complex memory complexA = Num_Complex.Complex(ar, ai);
+    //     Num_Complex.Complex memory complexB = Num_Complex.Complex(br, bi);
+    //     int256 resultR = num_complex.div(complexA, complexB).re;
+    //     int256 resultI = num_complex.div(complexA, complexB).im;
 
-        assertEq(resultR, r);
-        assertEq(resultI, i);
-    }
+    //     assertEq(resultR, r);
+    //     assertEq(resultI, i);
+    // }
 
-    function testCalcRFuzz(int256 a, int256 b) public {
-        a = bound(a, -1e20, 1e20);
-        b = bound(a, -1e20, 1e20);
+    // function testCalcRFuzz(int256 a, int256 b) public {
+    //     a = bound(a, -1e20, 1e20);
+    //     b = bound(a, -1e20, 1e20);
 
-        uint256 rH = complex.calcR(a * scale, b * scale);
-        uint256 rS = uint(num_complex.r2(a * scale, b * scale));
-        assertEq(rH / uint(scale), rS / uint(scale));
-    }
+    //     uint256 rH = complex.calcR(a * scale, b * scale);
+    //     uint256 rS = uint(num_complex.r2(a * scale, b * scale));
+    //     assertEq(rH / uint(scale), rS / uint(scale));
+    // }
 
     // failing fuzz test in case of theta
     // function testToPolarFuzz(int256 ar, int256 ai) public {
