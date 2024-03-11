@@ -345,7 +345,7 @@
 }
 
 
-// ///@notice e^(a+bi) calculation
+///@notice e^(a+bi) calculation
 
 #define macro EXP_Z() = takes(2) returns(2) {
  //INPUT STACK => [Re(A),Im(A)]

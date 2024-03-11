@@ -85,7 +85,7 @@ contract ComplexTest is Test {
     }
 
     function testExpZ() public {
-        (int256 r, int256 i) = complex.expZ(92729522 * 1e10, 1);
+        (int256 r, int256 i) = complex.expZ(92729522*1e10 , 1);
         assertApproxEqAbs(r, 1630800000000000000, 1e15);
         assertApproxEqAbs(i, 2174400000000000000, 1e15);
     }
@@ -111,10 +111,6 @@ contract ComplexTest is Test {
         int256 r = complex.atan1to1(9 * 1e17);
         assertEq((r * 100) / scale, 73);
     }
-
-    // ai,bi,ar,br
-    // ai,bi,br,ar
-    // bi,ai,ar,br
     // bi,ai,br,ar
 
     function testAddZFuzz(int256 bi, int256 ai, int256 br, int256 ar) public {
@@ -194,7 +190,29 @@ contract ComplexTest is Test {
         assertEq(rH / uint(scale), rS / uint(scale));
     }
 
-    // failing fuzz test in case of theta
+        function testFromPolarFuzz(int256 r, int256 T) public {
+        vm.assume(r !=0);
+
+        r = bound(r, -1e20, 1e20);
+        T = bound(T, -1e20, 1e20);
+        (int256 rH, int256 iH) = complex.fromPolar(r * scale, T * 1e10);
+        Num_Complex.Complex memory complexA = num_complex.fromPolar(r * scale, T * 1e10);
+        (int256 rS, int256 iS) = num_complex.unwrap(complexA);
+
+        assertEq(rH, rS);
+        assertEq(iH, iS);
+
+    }
+
+    function testAtan1to1Fuzz(int256 r) public {
+        r = bound(r, -1e10, 1e10);
+        int256 rH = complex.atan1to1(r* 1e17);
+        int256 rS = num_complex.atan1to1(r*1e17);
+        assertEq((rH * 100) / scale, (rS*100)/scale);
+    }
+
+    // failing fuzz test due to Topolar
+    
     // function testToPolarFuzz(int256 ar, int256 ai) public {
     //     vm.assume(ar !=0);
     //     vm.assume(ai !=0);
@@ -222,6 +240,45 @@ contract ComplexTest is Test {
     //     assertEq(r / scale, resultR / (scale));
     //     assertEq(i, resultI );
     // }
+
+    // function testAtan2() public {
+    //     int256 r = complex.p_atan2(4 * scale, 3 * scale);
+    //     int256 rS = num_complex.p_atan2(4 * scale, 3 * scale);
+    //     assertEq((rS * 100) / scale, 0);
+    //     assertEq((r * 100) / scale, 0);
+    // }
+
+    //  function testLnZFuzz(int256 ar, int256 ai) public {
+    //     vm.assume(ar != 0);
+    //     vm.assume(ai != 0);
+    //     (int256 r, int256 i) = complex.ln(ar * scale, ar * scale);
+    //     Num_Complex.Complex memory complexA = Num_Complex.Complex(ar*scale,ai*scale);
+    //     (int256 rS, int256 iS) = num_complex.unwrap(num_complex.ln(complexA));
+    //     assertEq((r * 100) / scale,(rS * 100) / scale ); // ln(50) = 3.912..
+    //     assertEq((i * 100) / scale, (iS * 100) / scale);
+    // }
+
+    // function testExpZFuzz(int256 ar, int256 ai) public {
+    //     (int256 rH, int256 iH) = complex.expZ(ar , ai);
+    //     Num_Complex.Complex memory complexA =Num_Complex.Complex(ar,ai);
+    //     (int256 rS, int256 iS) = num_complex.unwrap(num_complex.exp(complexA));
+    //     assertEq(rS ,rH);
+    //     assertEq(iS,iH);
+    // }
+
+    
+    // function testPowZ(int256 p, int256 ai, int256 ar) public {
+    //     (int256 rH, int256 iH) = complex.pow(p, ai * scale, ar * scale);
+    //     Num_Complex.Complex memory complexA =Num_Complex.Complex(ar*scale,ai*scale);
+    //     (int256 rS, int256 iS) = num_complex.unwrap(num_complex.pow(complexA,p));
+    //     assertEq(rH,rS );
+    //     assertEq(iH,iS );
+    // }
+
+
+     
+
+     
 }
 
 interface WRAPPER {
