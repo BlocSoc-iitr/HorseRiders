@@ -670,7 +670,6 @@ library PRBMathSD59x18 {
             }
             if (x > MAX_SD59x18 / SCALE) {
                 revert PRBMathSD59x18__SqrtOverflow(x);
-
             }
             // Multiply x by the SCALE to account for the factor of SCALE that is picked up when multiplying two signed
             // 59.18-decimal fixed-point numbers together (in this case, those two numbers are both the square root).
@@ -686,5 +685,4 @@ library PRBMathSD59x18 {
             result = x / SCALE;
         }
     }
-
 }

@@ -18,45 +18,25 @@ contract ComplexTest is Test {
     }
 
     function testSubZ() public {
-        (int256 r, int256 i) = complex.subz(
-            4 * scale,
-            5 * scale,
-            8 * scale,
-            11 * scale
-        );
+        (int256 r, int256 i) = complex.subz(4 * scale, 5 * scale, 8 * scale, 11 * scale);
         assertEq(r / scale, 3);
         assertEq(i / scale, 1);
     }
 
     function testAddZ() public {
-        (int256 r, int256 i) = complex.addz(
-            2 * scale,
-            3 * scale,
-            4 * scale,
-            5 * scale
-        );
+        (int256 r, int256 i) = complex.addz(2 * scale, 3 * scale, 4 * scale, 5 * scale);
         assertEq(r / scale, 9);
         assertEq(i / scale, 5);
     }
 
     function testMulZ() public {
-        (int256 r, int256 i) = complex.mulz(
-            2 * scale,
-            3 * scale,
-            4 * scale,
-            5 * scale
-        );
+        (int256 r, int256 i) = complex.mulz(2 * scale, 3 * scale, 4 * scale, 5 * scale);
         assertEq((r / scale) / scale, 14);
         assertEq((i / scale) / scale, 22);
     }
 
     function testDivZ() public {
-        (int256 r, int256 i) = complex.divz(
-            7 * scale,
-            1 * scale,
-            5 * scale,
-            2 * scale
-        );
+        (int256 r, int256 i) = complex.divz(7 * scale, 1 * scale, 5 * scale, 2 * scale);
         assertEq((r * 10) / scale, 2); // 17/74
         assertEq((i * 10) / scale, -1); // -8/74
     }
@@ -85,7 +65,7 @@ contract ComplexTest is Test {
     }
 
     function testExpZ() public {
-        (int256 r, int256 i) = complex.expZ(92729522*1e10 , 1);
+        (int256 r, int256 i) = complex.expZ(92729522 * 1e10, 1);
         assertApproxEqAbs(r, 1630800000000000000, 1e15);
         assertApproxEqAbs(i, 2174400000000000000, 1e15);
     }
@@ -186,12 +166,12 @@ contract ComplexTest is Test {
         b = bound(a, -1e20, 1e20);
 
         uint256 rH = complex.calcR(a * scale, b * scale);
-        uint256 rS = uint(num_complex.r2(a * scale, b * scale));
-        assertEq(rH / uint(scale), rS / uint(scale));
+        uint256 rS = uint256(num_complex.r2(a * scale, b * scale));
+        assertEq(rH / uint256(scale), rS / uint256(scale));
     }
 
-        function testFromPolarFuzz(int256 r, int256 T) public {
-        vm.assume(r !=0);
+    function testFromPolarFuzz(int256 r, int256 T) public {
+        vm.assume(r != 0);
 
         r = bound(r, -1e20, 1e20);
         T = bound(T, -1e20, 1e20);
@@ -201,18 +181,17 @@ contract ComplexTest is Test {
 
         assertEq(rH, rS);
         assertEq(iH, iS);
-
     }
 
     function testAtan1to1Fuzz(int256 r) public {
         r = bound(r, -1e10, 1e10);
-        int256 rH = complex.atan1to1(r* 1e17);
-        int256 rS = num_complex.atan1to1(r*1e17);
-        assertEq((rH * 100) / scale, (rS*100)/scale);
+        int256 rH = complex.atan1to1(r * 1e17);
+        int256 rS = num_complex.atan1to1(r * 1e17);
+        assertEq((rH * 100) / scale, (rS * 100) / scale);
     }
 
     // failing fuzz test due to Topolar
-    
+
     // function testToPolarFuzz(int256 ar, int256 ai) public {
     //     vm.assume(ar !=0);
     //     vm.assume(ai !=0);
@@ -266,7 +245,6 @@ contract ComplexTest is Test {
     //     assertEq(iS,iH);
     // }
 
-    
     // function testPowZ(int256 p, int256 ai, int256 ar) public {
     //     (int256 rH, int256 iH) = complex.pow(p, ai * scale, ar * scale);
     //     Num_Complex.Complex memory complexA =Num_Complex.Complex(ar*scale,ai*scale);
@@ -274,41 +252,16 @@ contract ComplexTest is Test {
     //     assertEq(rH,rS );
     //     assertEq(iH,iS );
     // }
-
-
-     
-
-     
 }
 
 interface WRAPPER {
-    function subz(
-        int256,
-        int256,
-        int256,
-        int256
-    ) external returns (int256, int256);
+    function subz(int256, int256, int256, int256) external returns (int256, int256);
 
-    function addz(
-        int256,
-        int256,
-        int256,
-        int256
-    ) external returns (int256, int256);
+    function addz(int256, int256, int256, int256) external returns (int256, int256);
 
-    function mulz(
-        int256,
-        int256,
-        int256,
-        int256
-    ) external returns (int256, int256);
+    function mulz(int256, int256, int256, int256) external returns (int256, int256);
 
-    function divz(
-        int256,
-        int256,
-        int256,
-        int256
-    ) external returns (int256, int256);
+    function divz(int256, int256, int256, int256) external returns (int256, int256);
 
     function calcR(int256, int256) external returns (uint256);
 
