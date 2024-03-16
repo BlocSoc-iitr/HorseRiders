@@ -13,6 +13,8 @@
 #define function sqrt(int256,int256) view returns (int256,int256)
 #define function expZ(int256,int256) view returns (int256,int256)
 #define function pow(int256,int256,int256) view returns (int256,int256)
+#define function rotateComplexz(int256,int256,int256) view returns (int256,int256)
+#define function lineequationz(int256,int256,int256,int256) view returns (int256,int256)
 
 
 #define macro SUB_Z_LOCAL() = takes (0) returns (0) {
@@ -148,6 +150,35 @@
 }
 
 
+#define macro rotateComplex_LOCAL() = takes(0) returns(0){
+    0x04 calldataload
+    0x24 calldataload
+    0x44 calldataload
+    rotateComplex()
+    0x00 mstore
+    0x20 mstore
+    0x40 0x00 return
+}
+
+
+
+#define macro LINEEQUATION_LOCAL() = takes (0) returns (0) {
+    // Load value from storage.
+    0x04 calldataload //[r1]
+    0x24 calldataload //[r2]
+    0x44 calldataload //[i1]
+    0x64 calldataload //[i2, i1, r2, r1]
+    LINEEQUATION()
+    // Store value in memory.
+    0x00 mstore
+    0x20 mstore
+    // Return value
+    0x40 0x00 return
+}
+
+
+
+
 
 #define macro MAIN() = takes (0) returns (0) {
     // Identify which function is being called.
@@ -164,7 +195,10 @@
     dup1 __FUNC_SIG(ln) eq ln_Z jumpi
     dup1 __FUNC_SIG(sqrt) eq sqrt_jump jumpi 
     dup1 __FUNC_SIG(expZ) eq exp_Z jumpi
-    dup1    __FUNC_SIG(pow) eq pow_Z jumpi
+    dup1 __FUNC_SIG(pow) eq pow_Z jumpi
+    dup1 __FUNC_SIG(rotateComplexz) eq rotateComplex_Z jumpi
+    dup1 __FUNC_SIG(lineequationz) eq lineequation_Z jumpi
+
 
     0x00 0x00 revert
 
@@ -207,5 +241,9 @@
     pow_Z:
     POW_LOCAL()
 
+    rotateComplex_Z:
+    rotateComplex_LOCAL()
 
+    lineequation_Z:
+    LINEEQUATION_LOCAL()
 }

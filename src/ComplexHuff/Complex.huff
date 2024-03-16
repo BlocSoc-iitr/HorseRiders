@@ -409,8 +409,11 @@
 }
 
 // to find the the equation of a line passing through two complex numbers 
-#define macro LINE_EQUATION() = takes(4) returns(2) {
-    // INPUT STACK => [Re(a), Im(a), Re(b), Im(b)]
+#define macro LINEEQUATION() = takes(4) returns(2) {
+    //INPUT STACK => [RE(a),RE(b),IM(a),IM(b)]
+    swap1           //[rb,ra,ia,ib]
+    swap2           //[ia,ra,rb,ib]
+    swap1           //[ra,ia,rb,ib]
     dup3            //[rb,ra,ia,rb,ib]
     sub             //[rb-ra,ia,rb,ib]
     swap1           //[ia,rb-ra,rb,ib]

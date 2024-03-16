@@ -89,16 +89,16 @@ contract ComplexTest is Test {
         assertEq((r * 100) / scale, 73);
     }
 
-    function testrotateComplex() public{
-        (int256 r,int256 i) = complex.rotateComplex(2*scale, 2*scale, 90);
-        assertEq(r / scale , -2);
-        assertEq(i / scale, 2);
+    function testrotateComplex() public {
+        (int256 r, int256 i) = complex.rotateComplexz(267116799542721300, 3 * scale, 4 * scale);
+        assertApproxEqAbs(r, 3 * scale, 1e17);
+        assertApproxEqAbs(i, 4 * scale, 1e17);
     }
 
-    function testLINE_EQUATION() public{
-        (int256 m , int256 c)=complex.LINE_EQUATION(1*scale, 1*scale, -1*scale, 3*scale);
-        assertEq(m / scale , -1);
+    function testLINE_EQUATION() public {
+        (int256 m, int256 c) = complex.lineequationz(19 * scale, 15 * scale, 7 * scale, 5 * scale);
         assertEq(m / scale, 2);
+        assertEq(c / scale ** 2, 5);
     }
 }
 
@@ -128,4 +128,8 @@ interface WRAPPER {
     function expZ(int256, int256) external returns (int256, int256);
 
     function pow(int256, int256, int256) external returns (int256, int256);
+
+    function rotateComplexz(int256, int256, int256) external returns (int256, int256);
+
+    function lineequationz(int256, int256, int256, int256) external returns (int256, int256);
 }
