@@ -36,13 +36,13 @@ contract ComplexTest is Test {
 
     function testDivZ() public {
         (int256 r, int256 i) = complex.divz(7 * scale, 1 * scale, 5 * scale, 2 * scale);
-        assertEq((r * 10) / scale, 2); // 17/74
-        assertEq((i * 10) / scale, -1); // -8/74
+        assertEq(r, 229729729729729729); // (17/74 = 0.229729729729729729..)
+        assertEq(i, -121621621621621621); // (-9/74=-0.121621621621621621)
     }
 
     function testCalcR() public {
         uint256 r = complex.calcR(4 * scale, 4 * scale);
-        assertEq(r / uint256(scale), 5);
+        assertEq(r, 5656854249492380195); // root(32)=5.656854249492380195
     }
 
     function testToPolar() public {
@@ -104,63 +104,69 @@ contract ComplexTest is Test {
         br = bound(br, -1e40, 1e40);
         ar = bound(ar, -1e40, 1e40);
         cr = bound(cr, -1e40, 1e40);
-        (int256 complexA_Br,int256 complexA_Bi)=(complex.addz(bi,ai,br,ar));                                            //A+B
-        (int256 complexB_Ar,int256 complexB_Ai)=(complex.addz(ai,bi,ar,br));                                            //B+A
-        (int256 complexB_Cr,int256 complexB_Ci)=(complex.addz(ci,bi,cr,br));                                            //B+C
-        (int256 complexAB_Cr,int256 complexAB_Ci) = (complex.addz(ci,complexA_Bi,cr,complexA_Br));                      //(A+B)+C
-        (int256 complexA_BCr,int256 complexA_BCi) = (complex.addz(complexB_Ci,ai,complexB_Cr,ar));                      //A+(B+c)
-        (int256 complexA_0r ,int256 complexA_0i)= (complex.addz(0,ai,0,ar));                                            //A + 0
-        (int256 complexA__Ar,int256 complexA__Ai) = (complex.addz(-(ai),ai,-(ar),ar));                                  //A + (-A)
+        (int256 complexA_Br, int256 complexA_Bi) = (complex.addz(bi, ai, br, ar)); //A+B
+        (int256 complexB_Ar, int256 complexB_Ai) = (complex.addz(ai, bi, ar, br)); //B+A
+        (int256 complexB_Cr, int256 complexB_Ci) = (complex.addz(ci, bi, cr, br)); //B+C
+
         //Commutative A + B = B + A
-        assertEq(complexA_Br,complexB_Ar);
-        assertEq(complexA_Bi,complexB_Ai);
+        assertEq(complexA_Br, complexB_Ar);
+        assertEq(complexA_Bi, complexB_Ai);
+
+        //Used same variables to avoid stacktoodeep error
+        (complexA_Br, complexA_Bi) = (complex.addz(ci, complexA_Bi, cr, complexA_Br)); //(A+B)+C
+        (complexB_Cr, complexB_Ci) = (complex.addz(complexB_Ci, ai, complexB_Cr, ar)); //A+(B+c)
         //Associative (A+B)+C = A+(B+C)
-        assertEq(complexAB_Cr,complexA_BCr);
-        assertEq(complexAB_Ci,complexA_BCi);
+        assertEq(complexA_Br, complexB_Cr);
+        assertEq(complexA_Bi, complexB_Ci);
+
+        (complexA_Br, complexA_Bi) = (complex.addz(0, ai, 0, ar)); //A + 0
+        (complexB_Cr, complexB_Ci) = (complex.addz(-(ai), ai, -(ar), ar)); //A + (-A)
         // Existance of additive identity A+0=A
-        assertEq(complexA_0r,ar);
-        assertEq(complexA_0i,ai);
+        assertEq(complexA_Br, ar);
+        assertEq(complexA_Bi, ai);
         //Existance of additive inverse A + (-A)=0
-        assertEq(complexA__Ar,0);
-        assertEq(complexA__Ai,0);
+        assertEq(complexB_Cr, 0);
+        assertEq(complexB_Ci, 0);
     }
 
     function testSubZFuzz(int256 bi, int256 ai, int256 ci, int256 br, int256 ar, int256 cr) public {
         //bounded input to avoid underflow or overflow
-        vm.assume(ai!=bi);
-        vm.assume(bi!=ci);
-        vm.assume(ai!=ci);
-        vm.assume(ar!=br);
-        vm.assume(br!=cr);
-        vm.assume(ar!=cr);
-        vm.assume(bi!=0);
-        vm.assume(ai!=0);
-        vm.assume(ci!=0);
-        vm.assume(ar!=0);
-        vm.assume(br!=0);
-        vm.assume(cr!=0);
+        vm.assume(ai != bi);
+        vm.assume(bi != ci);
+        vm.assume(ai != ci);
+        vm.assume(ar != br);
+        vm.assume(br != cr);
+        vm.assume(ar != cr);
+        vm.assume(bi != 0);
+        vm.assume(ai != 0);
+        vm.assume(ci != 0);
+        vm.assume(ar != 0);
+        vm.assume(br != 0);
+        vm.assume(cr != 0);
         bi = bound(bi, -1e40, 1e40);
         ai = bound(ai, -1e40, 1e40);
         ci = bound(ci, -1e40, 1e40);
         br = bound(br, -1e40, 1e40);
         ar = bound(ar, -1e40, 1e40);
         cr = bound(cr, -1e40, 1e40);
-        (int256 complexA_Br,int256 complexA_Bi)=(complex.subz(bi,ai,br,ar));                                            //A-B
-        (int256 complexB_Ar,int256 complexB_Ai)=(complex.subz(ai,bi,ar,br));                                            //B-A
-        (int256 complexB_Cr,int256 complexB_Ci)=(complex.subz(ci,bi,cr,br));                                            //B-C
-        (int256 complexAB_Cr,int256 complexAB_Ci) = (complex.subz(ci,complexA_Bi,cr,complexA_Br));                      //(A-B)-C
-        (int256 complexA_BCr,int256 complexA_BCi) = (complex.subz(complexB_Ci,ai,complexB_Cr,ar));                      //A-(B-c)
-        (int256 complexA_0r ,int256 complexA_0i)= (complex.subz(0,ai,0,ar));                                            //A - 0
 
+        (int256 complexA_Br, int256 complexA_Bi) = (complex.subz(bi, ai, br, ar)); //A-B
+        (int256 complexB_Ar, int256 complexB_Ai) = (complex.subz(ai, bi, ar, br)); //B-A
+        (int256 complexB_Cr, int256 complexB_Ci) = (complex.subz(ci, bi, cr, br)); //B-C
         //Commutative A - B != B - A
-        assertFalse(complexA_Br==complexB_Ar);
-        assertFalse(complexA_Bi==complexB_Ai);
+        assertFalse(complexA_Br == complexB_Ar);
+        assertFalse(complexA_Bi == complexB_Ai);
+
+        (complexA_Br, complexA_Bi) = (complex.subz(ci, complexA_Bi, cr, complexA_Br)); //(A-B)-C
+        (complexB_Ar, complexB_Ai) = (complex.subz(complexB_Ci, ai, complexB_Cr, ar)); //A-(B-c)
         //Associative (A-B)-C != A-(B-C)
-        assertFalse(complexAB_Cr==complexA_BCr);
-        assertFalse(complexAB_Ci==complexA_BCi);
+        assertFalse(complexA_Br == complexB_Ar);
+        assertFalse(complexA_Bi == complexB_Ai);
+
+        (complexA_Br, complexA_Bi) = (complex.subz(0, ai, 0, ar)); //A - 0
         // Existance of additive identity A-0=A
-        assertEq(complexA_0r,ar);
-        assertEq(complexA_0i,ai);
+        assertEq(complexA_Br, ar);
+        assertEq(complexA_Bi, ai);
     }
 
     function testMulZFuzz(int256 bi, int256 ai, int256 ci, int256 br, int256 ar, int256 cr) public {
@@ -195,54 +201,57 @@ contract ComplexTest is Test {
         br = bound(br, -1e10, 1e10);
         ar = bound(ar, -1e10, 1e10);
         cr = bound(cr, -1e10, 1e10);
+
         (int256 complexA_Br, int256 complexA_Bi) = (complex.mulz(bi, ai, br, ar)); //A*B
         (int256 complexB_Ar, int256 complexB_Ai) = (complex.mulz(ai, bi, ar, br)); //B*A
         (int256 complexB_Cr, int256 complexB_Ci) = (complex.mulz(ci, bi, cr, br)); //B*C
         (int256 complexA_Cr, int256 complexA_Ci) = (complex.mulz(ci, ai, cr, ar)); //A*C
-        (int256 complexAB_Cr, int256 complexAB_Ci) = (complex.mulz(ci, complexA_Bi, cr, complexA_Br)); //(AB)*C
-        (int256 complexA_BCr, int256 complexA_BCi) = (complex.mulz(complexB_Ci, ai, complexB_Cr, ar)); //A*(BC)
-        (int256 complexA__Br, int256 complexA__Bi) = (complex.addz(bi, ai, br, ar)); //A+B
-        (int256 complexAB__Cr, int256 complexAB__Ci) = (complex.mulz(ci, complexA__Bi, cr, complexA__Br)); //(A+B)*C
-        (int256 complexAC_BCr, int256 complexAC_BCi) =
-            (complex.addz(complexB_Ci, complexA_Ci, complexB_Cr, complexA_Cr)); // AC+BC
-        (int256 complexA_Ar, int256 complexA_Ai) = (complex.mulz(0, ai, 1, ar)); //A*1
-        (int256 complexdAr,int256 complexdAi) = (complex.divz(ai*scale,0*scale,ar*scale,1*scale)); // 1/A
-        (int256 complexinAr,int256 complexinAi)=(complex.mulz(complexdAi,ai,complexdAr,ar)); // (1/A)*A
+        //Commutative A*B = B*A
+        assertEq(complexA_Br, complexB_Ar);
+        assertEq(complexA_Bi, complexB_Ai);
 
-        //Commutative A*B != B*A
-        assertFalse(complexA_Br != complexB_Ar);
-        assertFalse(complexA_Bi != complexB_Ai);
+        (complexA_Br, complexA_Bi) = (complex.mulz(ci, complexA_Bi, cr, complexA_Br)); //(AB)*C
+        (complexB_Ar, complexB_Ai) = (complex.mulz(complexB_Ci, ai, complexB_Cr, ar)); //A*(BC)
         //Associative (AB)C=A(BC)
-        assertEq(complexAB_Cr, complexA_BCr);
-        assertEq(complexAB_Ci, complexA_BCi);
+        assertEq(complexA_Br, complexB_Ar);
+        assertEq(complexA_Bi, complexB_Ai);
+
+        (complexA_Br, complexA_Bi) = (complex.addz(bi, ai, br, ar)); //A+B
+        (complexA_Br, complexA_Bi) = (complex.mulz(ci, complexA_Bi, cr, complexA_Br)); //(A+B)*C
+        (complexB_Ar, complexB_Ai) = (complex.addz(complexB_Ci, complexA_Ci, complexB_Cr, complexA_Cr)); // AC+BC
         //Distributive (A+B)*C=AC+BC
-        assertEq(complexAB__Cr, complexAC_BCr);
-        assertEq(complexAB__Ci, complexAC_BCi);
+        assertEq(complexA_Br, complexB_Ar);
+        assertEq(complexA_Bi, complexB_Ai);
+
+        (complexA_Br, complexA_Bi) = (complex.mulz(0, ai, 1, ar)); //A*1
         // Existance of additive identity A*1=A
-        assertEq(complexA_Ar, ar);
-        assertEq(complexA_Ai, ai);
+        assertEq(complexA_Br, ar);
+        assertEq(complexA_Bi, ai);
+
+        (complexA_Br, complexA_Bi) = (complex.divz(ai * scale, 0 * scale, ar * scale, 1 * scale)); // 1/A
+        (complexA_Br, complexA_Bi) = (complex.mulz(complexA_Bi, ai, complexA_Br, ar)); // (1/A)*A
         //Existance of additive inverse A*(1/A)= 1
-        assertEq(complexinAi/scale,0);
-        assertApproxEqAbs(complexinAr*10/scale,10,5);
+        assertEq(complexA_Bi / scale, 0);
+        assertApproxEqAbs(complexA_Br * 10 / scale, 10, 5);
     }
 
     // devision is basically and multiplication of complex numbers is tested above
-    function testDivZFuzz(int256 ar,int256 ai,int256 br,int256 bi) public{
-        vm.assume(ai!=0);
-        vm.assume(bi!=0);
-        vm.assume(ar!=0);
-        vm.assume(br!=0);
-        ai = bound(ai,-1e10,1e10);
-        bi = bound(bi,-1e10,1e10);
-        ar = bound(ar,-1e10,1e10);
-        br = bound(br,-1e10,1e10);
-        (int256 Nr,int256 Ni)=(complex.mulz(-bi,ai,br,ar));
-        (int256 Dr,)=(complex.mulz(-bi,bi,br,br));
-        int256 Rr= PRBMathSD59x18.div(Nr,Dr);
-        int256 Ri= PRBMathSD59x18.div(Ni,Dr);
-        (int256 Rhr,int256 Rhi)=(complex.divz(bi,ai,br,ar));
-        assertEq(Rr,Rhr);
-        assertEq(Ri,Rhi);
+    function testDivZFuzz(int256 ar, int256 ai, int256 br, int256 bi) public {
+        vm.assume(ai != 0);
+        vm.assume(bi != 0);
+        vm.assume(ar != 0);
+        vm.assume(br != 0);
+        ai = bound(ai, -1e10, 1e10);
+        bi = bound(bi, -1e10, 1e10);
+        ar = bound(ar, -1e10, 1e10);
+        br = bound(br, -1e10, 1e10);
+        (int256 Nr, int256 Ni) = (complex.mulz(-bi, ai, br, ar));
+        (int256 Dr,) = (complex.mulz(-bi, bi, br, br));
+        int256 Rr = PRBMathSD59x18.div(Nr, Dr);
+        int256 Ri = PRBMathSD59x18.div(Ni, Dr);
+        (int256 Rhr, int256 Rhi) = (complex.divz(bi, ai, br, ar));
+        assertEq(Rr, Rhr);
+        assertEq(Ri, Rhi);
     }
 
     // function testCalc_RFuzz(int256 ar, int256 ai, int256 br, int256 bi, int256 k) public {
@@ -273,8 +282,6 @@ contract ComplexTest is Test {
     //     // mag(A)=mag(A')
     //     assertEq(R1,_R1);
     // }
-
-    
 }
 
 interface WRAPPER {
