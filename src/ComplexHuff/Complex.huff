@@ -5,7 +5,7 @@
 
 #define constant VALUE_LOCATION = FREE_STORAGE_POINTER()
 
-#define macro ADD_Z() = takes (0) returns (0) {
+#define macro ADD_Z() = takes (4) returns (2) {
     add              // [Re(A)+Re(B),Im(A),Im(B)]
     swap2            // [Im(B),Im(A),Re(A)+Re(B)]
     add              // [Im(B)+Im(A),Re(A)+Re(B)]
@@ -103,16 +103,16 @@
 #define macro TO_POLAR() = takes(2) returns(2) {
     // INPUT STACK => [RE(a),IM(a)]
 
-    dup2      //[i,r,i]
-    dup2       //[r,i,r,i]
-    CALC_R()
-    swap2            // [Im(a),Re(a),r]
-    [X3]
-    mul 
-    sdiv             // [1e18*Im(a)/Re(a),r] => [x1,r]
-    dup1
-    [X3]
-    gt case1 jumpi
+    dup2                                //[i,r,i]
+    dup2                                //[r,i,r,i]
+    CALC_R()                            //[r,ra,ia]
+    swap2                               // [Im(a),Re(a),r]
+    [X3]                                //[1e18,ia,ra,r]
+    mul                                 //[1e18*ia,ra,r]
+    sdiv                                //[1e18*Im(a)/Re(a),r] => [x1,r]
+    dup1                                //[x1,x1,r]
+    [X3]                                //[1e18,x1,x1,r]
+    gt case1 jumpi                      //[1e18>x1,x1,r]
     dup1 
     [X3] 
     eq case2 jumpi
@@ -156,11 +156,11 @@
     swap1
     finish jump
 
-    case1:
+    case1:           // if y>x
     dup1             // [x1,x1,r]
-    [X11]
-    swap1
-    sdiv             // [a,x1,r]
+    [X11]            //[1e12,x1,x1,r]
+    swap1            //[x1,1e12,x1,r]
+    sdiv             // [a=x1/1e12,x1,r]
     0x03             // [0x03,a,x1,r]
     swap1            // [a,3,x1,r]
     exp              // [a**3,x1,r]
@@ -170,9 +170,9 @@
     0x01              // [1,a**3/3,..]
     0x00             // [0,1,a**3/3,..]
     sub              // [-1,a**3/3,..]
-    mul              // [x2,x1,r]
+    mul              // [x2=-(a**3)/3,x1,r]
     dup2             // [x1,x2,x1,r]
-    [X12]            
+    [X12]            //[]
     swap1
     sdiv             //[b,x2,..]
     0x05             //[5,b,..]
@@ -345,7 +345,7 @@
 }
 
 
-// ///@notice e^(a+bi) calculation
+///@notice e^(a+bi) calculation
 
 #define macro EXP_Z() = takes(2) returns(2) {
  //INPUT STACK => [Re(A),Im(A)]

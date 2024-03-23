@@ -69,8 +69,9 @@ contract Num_Complex {
         a.re = _a - _b;
         a.im = _c + _d;
 
-        a.re /= 1e18;
-        a.im /= 1e18;
+        // a.re /= 1e18;
+        // a.im /= 1e18;
+        // Various Fuzz Test were failing due the above two lines
 
         return a;
     }
@@ -85,7 +86,8 @@ contract Num_Complex {
         int256 numB = a.im * b.re - a.re * b.im;
 
         a.re = (numA * 1e18) / den;
-        b.im = (numB * 1e18) / den;
+        //b.im = (numB * 1e18) / den; should be a instead of b
+        a.im = (numB * 1e18) / den;
 
         return a;
     }
@@ -108,7 +110,9 @@ contract Num_Complex {
     /// @return r r
     /// @return T theta
     function toPolar(Complex memory a) public pure returns (int256, int256) {
-        int256 r = r2(a.re, a.im);
+        int256 r = r2(a.re, a.im); // not returning desirable output during fuzzing
+        // int256 r = (a.re * a.re + a.im * a.im).sqrt() / 1e9; // Fuzzing test were passing when devided by 1e9
+
         //int BdivA = re / im;
         if (r > 0) {
             // im/re or re/im ??
