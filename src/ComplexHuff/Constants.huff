@@ -17,3 +17,8 @@
 #define constant X13 = 0x3B9ACA00                 // 1e9
 #define constant X14 = 0x1CC2C05DBC54   // 1e(13.5)
 #define constant X15 = 0x2386F26FC10000         // 1e16
+#define constant X16 = 0x987e5c9eb0764            // 1e(18*6/7)
+#define constant X17 = 0x13fa76ed4e1003            // 1e(18*7/8)
+
+
+
