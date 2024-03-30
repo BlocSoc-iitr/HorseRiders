@@ -103,6 +103,7 @@
 #define macro TO_POLAR() = takes(2) returns(2) {
     // INPUT STACK => [RE(a),IM(a)]
 
+
     dup2                                //[i,r,i]
     dup2                                //[r,i,r,i]
     CALC_R()                            //[r,ra,ia]
@@ -116,28 +117,28 @@
     dup1 
     [X3] 
     eq case2 jumpi
-    [X3]
-    swap1
-    sub      //[x1-1e18]
-    0x02
-    swap1
-    sdiv     // [x1_new]
-    dup1
-    0x02 
-    mul
-    [X13]
-    swap1
-    sdiv
-    0x02
-    swap1
-    exp
-    0x04
-    swap1
-    sdiv 
-    0x01
-    0x00
-    sub
-    mul //[x2_new,x1_new]
+    [X3]     //[1e18,x1,r]  
+    swap1    //[x1,1e18,r]
+    sub      //[x1-1e18,r]
+    0x02     //[2,x1-1e18,r]
+    swap1    //[x1-1e18,2,r]
+    sdiv     //[x1_new=x1-1e18/2,r]
+    dup1     //[x1_new,x1_new,r]
+    0x02     //[2,x1_new,x1_new,r]
+    mul      //[2*x1_new,x1_new,r]
+    [X13]    //[1e9,...]
+    swap1    //[2*x1_new,1e9,..]
+    sdiv     //[2*x1_new/1e9,..]
+    0x02     //[2,...]
+    swap1    //[a=2*x1_new/1e9,2,..]
+    exp      //[a**2,..]
+    0x04     //[4,...]
+    swap1    //[a**2,4,..]
+    sdiv     //[a**2/4,..]
+    0x01     //[1,...]
+    0x00     //[0,1,...]
+    sub      //[-1,...]
+    mul      //[x2_new=]
     dup2
     0x02 
     mul
@@ -167,7 +168,7 @@
     0x03             // [3,a**3,x1,r]
     swap1            // [a**3,3,..]
     sdiv             // [a**3/3 , x, r]
-    0x01              // [1,a**3/3,..]
+    0x01             // [1,a**3/3,..]
     0x00             // [0,1,a**3/3,..]
     sub              // [-1,a**3/3,..]
     mul              // [x2=-(a**3)/3,x1,r]
@@ -180,8 +181,36 @@
     exp              // [b**5,..]
     0x05             
     swap1
-    sdiv             // [x3,x2,x1,r]
+    sdiv              // [x3,x2,x1,r]
     add               // [x3+x2,x1,r]
+    dup2              // [x1,x3+x2,x1,r]
+    [X16]             // [X16,x1,..]
+    swap1             // [x1,X16,...]
+    sdiv              // [c=x1/X16,x3+x2,x1,r]
+    0x07              // [7,c,...]
+    swap1             // [c,7,...]
+    exp               // [c**7,...]
+    0x07              // [7,c**7,...]
+    swap1             // [c**7,7,...]
+    sdiv              // [c**7/7,...]
+    0x01              // [1,....]
+    0x00              // [0,1,....]
+    sub               // [-1,....]
+    mul               // [-c**7/7,...]
+    add               // [x4+x3+x2,x1,r]
+    dup2              // [x1,...]
+    [X17]             // [X17,x1,...]
+    swap1             // [x1,X17,...]
+    sdiv              // [x1/X17,...]
+    0x08              // [8,x1/X17,...]
+    swap1             // [x1/X17,8,...]
+    exp               // [d**8,...]
+    0x960             // [2400,d**8,...]
+    mul               // [2400*d**8,...]
+    0x9d80            // [40320,2400*d**8,...]
+    swap1             // [2400*d**8,40320,...]
+    sdiv              // [x5,x4+x3+x2,x1,r] // x5 is calculated by error approximation and hit and trial to make the graph similar to arctanx
+    add
     add               // [theta,r]
     swap1
     finish jump
