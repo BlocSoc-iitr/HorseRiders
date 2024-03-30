@@ -46,9 +46,9 @@ contract ComplexTest is Test {
     }
 
     function testToPolar() public {
-        (int256 r, int256 t) = complex.toPolar(3,4);
+        (int256 r, int256 t) = complex.toPolar(3, 4);
         assertEq(r, 5);
-        assertEq(t/1e15, 643);              // arctan(0.75)=0.643501108793  approximated to 3 decimal places
+        assertEq(t / 1e15, 643); // arctan(0.75)=0.643501108793  approximated to 3 decimal places
     }
 
     function testFromPolar() public {
@@ -265,9 +265,9 @@ contract ComplexTest is Test {
         vm.assume(ar != 0);
         vm.assume(br != 0);
 
-        (int256 mag1r,) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // ar^2 + ai^2
+        (int256 mag1r,) = (complex.mulz(-ai * scale, ai * scale, ar * scale, ar * scale)); // ar^2 + ai^2
         mag1r = PRBMathSD59x18.sqrt(mag1r); // (ar^2+ai^2)^0.5
-        uint256 R1 = (complex.calcR(ai*scale, ar*scale)); // magnitude(A)
+        uint256 R1 = (complex.calcR(ai * scale, ar * scale)); // magnitude(A)
         // Test by comparing
         assertEq(uint256(mag1r) / 1e9, R1);
 
