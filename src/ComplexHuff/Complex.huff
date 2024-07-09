@@ -307,7 +307,7 @@
     sub                   // [X5*x/1e18-((x*(x-1e18)/1e18)*(X6+x*X7/1e18))/1e18]
 }
 
-#define macro LN() = takes(2) returns(1) {
+#define macro LN() = takes(2) returns(2) {
    //INPUT STACK => [Re(A),Im(A)]
 
    TO_POLAR()          // [r,T]
@@ -358,7 +358,7 @@
 ///@notice power of complex numbers
 
 #define macro POW() = takes(3) returns(2) {
-   //INPUT STACK => [Re(a),Im(b),n]
+   //INPUT STACK => [Re(a),Im(b),n] 
 
     TO_POLAR()          // [r,T,n]
     swap1               // [T,r,n]
