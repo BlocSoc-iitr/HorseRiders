@@ -303,6 +303,30 @@ contract ComplexTest is Test {
         assertApproxEqAbs((i/(scale)) , ai*scale , 5e17);
     }
 
+ function testAtan1to1Fuzz(int256 ar, int256 br) public {
+        ar = bound(ar, 1e16, 1e18);
+        br = bound(br, 1e16, 1e18);
+
+        int256 r = complex.atan1to1(ar);
+       assert(-157*1e16 <= r && r <= 157*1e16);
+
+        int256 r1 = (Trigonometry.sin(uint256(r))*1e18)/Trigonometry.cos(uint256(r)) ;
+        assertApproxEqAbs(ar , r1 , 5e15);
+
+        ar = bound(ar , 1e15 , 1e16);
+         r = complex.atan1to1(ar);
+         r1 = (Trigonometry.sin(uint256(r))*1e18)/Trigonometry.cos(uint256(r)) ;
+        assertApproxEqAbs(ar , r1 , 5e14);
+
+        ar = bound(ar , 1e14, 1e15);
+         r = complex.atan1to1(ar);
+         r1 = (Trigonometry.sin(uint256(r))*1e18)/Trigonometry.cos(uint256(r)) ;
+        assertApproxEqAbs(ar , r1 , 5e13);
+
+
+
+    }
+
 
 }
 
