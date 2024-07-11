@@ -20,6 +20,7 @@ contract PRBMathtest is Test {
        int256 res = num**2;
        res = prb_huff.sqrt(res);
        assertEq(res, num);
+      assertApproxEqAbs(PRBMathSD59x18.sqrt(num)/1e9, prb_huff.sqrt(num), 0);
     }
 
     function testFuzz_ln(int256 num) public {
