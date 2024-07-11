@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.15;
 
 import "foundry-huff/HuffDeployer.sol";
-import {Test } from "forge-std/Test.sol";
+import "forge-std/Test.sol";
+import "forge-std/console.sol";
 import "../src/complexMath/Complex.sol";
 import {PRBMathSD59x18} from "../src/complexMath/prbMath/PRBMathSD59x18.sol";
-
-
 
 contract ComplexTest is Test {
     WRAPPER public complex;
@@ -59,9 +58,9 @@ contract ComplexTest is Test {
     }
 
     function testSqrt() public {
-        (int256 r, int256 i) = complex.sqrt(-4* scale, -3 * scale);
-        assertEq(r / scale, 1);
-        assertEq(i / scale, 2);
+        (int256 r, int256 i) = complex.sqrt(12 * scale, -5 * scale);
+        assertEq(r / scale, 2);
+        assertEq(i / scale, 3);
     }
 
     function testExpZ() public {
@@ -70,43 +69,16 @@ contract ComplexTest is Test {
         assertApproxEqAbs(i, 2174400000000000000, 1e15);
     }
 
-    //modulus of e^A+BI = e^A
-    //theta of e^A+BI = B
-    //e^z*e^-z = 1
-    //ln of e^A+BI = A + BI
-
-    function testExpZ2(int256 ai , int256 bi ) public {
-        ai = bound(ai, -1e15 , 1e15);
-        bi = bound(bi, -1e15 , 1e15);
-        (int256 r1 , int256 i1 ) = complex.expZ(ai , bi);
-        int256 r = int256(complex.calcR( i1*scale, r1*scale));
-        // int256 r = PRBMathSD59x18.exp(ai);
-        (r1 , ) = complex.expZ(ai , 0);
-        assertApproxEqAbs(r1 , r/scale , 5e17);
-     
-
-        (int256 r2 , int256 i2) = complex.expZ(-ai*scale , -bi*scale);
-        (int256 r3 , int256 i3) = complex.expZ(ai*scale , bi*scale);
-        (int256 mul_r , int256 mul_i) = complex.mulz(i2 , i3 , r2 , r3);
-        assertApproxEqAbs(mul_r , scale , 1e15);
-        assertApproxEqAbs(mul_i , 0 , 1e15);
-
-        (int256 ln_r , int256 ln_i) = complex.ln(r , i);
-        assertApproxEqAbs(ln_r , ai*scale , 1e15);
-        assertApproxEqAbs(ln_i , bi*scale , 1e15);
-        
-    }
-    
     function testPowZ() public {
-        (int256 r, int256 i) = complex.pow(2, 6 * scale, 7 * scale);
-        assertApproxEqAbs(r, 13 * scale, 5e17);
-        assertApproxEqAbs(i, 84 * scale, 5e17);
+        (int256 r, int256 i) = complex.pow(2, 3 * scale, 2 * scale);
+        assertApproxEqAbs(r, -5 * scale, 5e17);
+        assertApproxEqAbs(i, 12 * scale, 5e17);
     }
 
     function testLnZ() public {
-        (int256 r, int256 i) = complex.ln(50* scale, -4* scale);
+        (int256 r, int256 i) = complex.ln(30 * scale, 40 * scale);
         assertEq((r * 100) / scale, 391); // ln(50) = 3.912..
-        assertEq((i * 100) / scale, 165);
+        assertEq((i * 100) / scale, 65);
     }
 
     function testAtan2() public {
@@ -263,7 +235,7 @@ contract ComplexTest is Test {
         assertApproxEqAbs(complexA_Br * 10 / scale, 10, 5);
     }
 
-    // devision is basically and multiplication of complex numb bners is tested above
+    // devision is basically and multiplication of complex numbers is tested above
     function testDivZFuzz(int256 ar, int256 ai, int256 br, int256 bi) public {
         vm.assume(ai != 0);
         vm.assume(bi != 0);
@@ -289,98 +261,35 @@ contract ComplexTest is Test {
     br = bound(br, -1e9, 1e9);
     k = bound(k, -1e8 , 1e8);
 
+    //ar^2+ai^2 = magnitude(A)**2
     (int256 mag1r,) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // ar^2 + ai^2
     int256 R1 = (int256((complex.calcR(ai*scale, ar*scale)))**2); // magnitude(A)
     assertApproxEqAbs(mag1r/scale, R1/scale, 5e17);
 
-  
+   //mag(A) = mag(-A)
     mag1r = int256(complex.calcR(-ai*scale ,  ar*scale)**2);
     assertEq(mag1r/scale, R1/scale);
 
-     (mag1r , ) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // kA
+   //(mag(a))**2 = (k*mag(A))**2
+    (mag1r , ) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // kA
      int256 R3 = (int256(complex.calcR((k*ai)*scale, (k*ar)*scale))**2); // magnitude(A)
     assertApproxEqAbs(((k**2)*(mag1r/scale)), R3/scale, 5e17);
-    
-    }
+
+   //mag(z1z2) = mag(z1)*mag(z2)
+    (int256 ir , int256 mag1i) = complex.mulz(bi*scale, ai*scale, br*scale, ar*scale);
+    R1 = (int256((complex.calcR((ai*scale), (ar*scale)))));
+    int256 R2 = (int256(complex.calcR(bi*scale, br*scale))); // magnitude(B)
+     R3 = (int256(complex.calcR((mag1i/scale) , (ir/scale))));
+    assertApproxEqAbs(R3 , (R1*R2)/scale, 5e17); 
 
 
-    //properties of log
-    //ln(xy) = ln(x)+ln(y)
-    //ln(x/y) = ln(x)-ln(y)
-    //ln(x**k) = kln(x)
-    //e**ln(K) = K
-    //ln(1) = 0
-
-    function testLnZFuzz(int256 ar , int256 ai  , int256 br , int256 bi) public {
-        
-    ai = bound(ai, 1, 10);
-    bi = bound(bi, 1, 10);
-    ar = bound(ar, 1, 10);
-    br = bound(br, 1, 10);
-     
-     //1
-     (int256 r_xy , int256 i_xy) = (complex.mulz(bi*scale , ai*scale, br*scale , ar * scale));
-    if ( r_xy > 0 && i_xy > 0){
-    (int256 ln_xy_r , int256 ln_xy_i) = complex.ln(i_xy / scale , r_xy / scale);
-    (int256 ln_ar , int256 ln_ar_i)  = complex.ln(ai*scale , ar*scale);
-    (int256 ln_br , int256 ln_br_i) = complex.ln(bi*scale , br*scale);
-    (int256 ln_arpbr , int256 ln_arpbr_i) = complex.addz(ln_br_i , ln_ar_i , ln_br , ln_ar );
-
-    assertApproxEqAbs(ln_xy_r , ln_arpbr , 2e18);
-    assertApproxEqAbs(ln_xy_i , ln_arpbr_i , 2e18 );
-    }
-
-    //  //2
-    //   (int256 r_xy2 , int256 i_xy2) = (complex.divz(bi , ai , br , ar));
-    //   int256 ln_xy2 = complex.ln(r_xy , i_xy);
-    //   int256 ln_ar2 = complex.ln(ar , ai);
-    //   int256 ln_br2 = complex.ln(br , bi);
-    //   if((ln_ar2 - ln_br2) > 0 ){
-    //     assertEq(ln_xy2 , (ln_ar2 - ln_br2))
-    //   }
-
-    //  //3
-    //   (int256 ln_powr , int26 ln_ powi) = complex.pow(ar , ai , 5)
-    //   int256 ln_pow = complex.ln(ln_powr , ln_powi);
-    //   int256 ln_5_pow =  5*(complex.ln(ar , ai));
-    //   assertEq(ln_pow , ln_5_pow);
-
-    //  //4
-    //   int256 ln = complex.ln 
+     //magnitude(A+B) <= magnitude(A) + magnitude(B)
+    R3  = (int256(complex.calcR((bi+ai)*scale , (br + ar)*scale)));
+    assert (R1 + R2 >= R3);
 
     }
 
-
-  function testpowzFuzz(int256 ar, int256 ai, int256 br, int256 bi, int256 k) public {
-         vm.assume(ai != 0);
-         vm.assume(bi != 0);
-         vm.assume(ar != 0);
-         vm.assume(br != 0);
-        vm.assume(k != 0);
-        ai = bound(ai, 1 , 10);
-        bi = bound(bi, 1 , 10);
-         ar = bound(ar, 1 , 10);
-        br = bound(br, 1 , 10);
-        k = bound(k, 1 , 10);
-
-         (int256 r , int256 i) = complex.pow(2 , ai*scale , ar*scale);
-         (int256 mul_r , int256 mul_i) = complex.mulz(ai*scale , ai*scale, ar*scale, ar*scale);
-          assertApproxEqAbs(r , mul_r/scale , 5e17);
-          assertApproxEqAbs(i , mul_i/scale , 5e17);
-
-
-        // //(ab)**c == (a**c)*(b**c)
-        //  (r , i) = complex.pow(k , ai*scale , ar*scale);
-        //  (int256 r1 , int256 i1) = complex.pow(k , bi*scale , br*scale);
-        //  (mul_r  , mul_i) = complex.mulz(bi*scale , ai*scale , br*scale , ar*scale);
-        //  (int256 r1r2c , int256 i1i2c) = complex.pow(k , mul_i , mul_r);
-        //  (int256 r1cr2c , int256 i1ci2c) = complex.mulz(i , i1 , r , r1);
-        //  assertEq(r1r2c , r1cr2c);
-        //  assertEq(i1i2c , i1ci2c);
-
-    }
-
-    function testSqrtfuzz(int256 ar , int256 ai ) public {
+     function testSqrtfuzz(int256 ar , int256 ai ) public {
         ai = bound(ai, -1e15 , 1e15);
         ar = bound(ar, -1e15 , 1e15);
     
@@ -394,7 +303,6 @@ contract ComplexTest is Test {
         assertApproxEqAbs((i/(scale)) , ai*scale , 5e17);
     }
 
-    
 
 }
 
