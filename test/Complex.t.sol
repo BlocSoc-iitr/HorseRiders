@@ -303,6 +303,8 @@ contract ComplexTest is Test {
         assertApproxEqAbs((i/(scale)) , ai*scale , 5e17);
     }
 
+//tan(tan-1x) = x
+
  function testAtan1to1Fuzz(int256 ar, int256 br) public {
         ar = bound(ar, 1e16, 1e18);
         br = bound(br, 1e16, 1e18);
