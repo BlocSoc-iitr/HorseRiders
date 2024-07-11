@@ -113,40 +113,40 @@
     dup1                                //[x1,x1,r]
     [X3]                                //[1e18,x1,x1,r]
     gt case1 jumpi                      //[1e18>x1,x1,r]
-    dup1 
-    [X3] 
-    eq case2 jumpi
-    [X3]
-    swap1
-    sub      //[x1-1e18]
-    0x02
-    swap1
-    sdiv     // [x1_new]
-    dup1
-    0x02 
-    mul
-    [X13]
-    swap1
-    sdiv
-    0x02
-    swap1
-    exp
-    0x04
-    swap1
-    sdiv 
-    0x01
-    0x00
-    sub
-    mul //[x2_new,x1_new]
-    dup2
-    0x02 
-    mul
-    [X11] 
-    sdiv
-    0x03
-    swap1
-    exp
-    0x0c
+    dup1                                //[x1,x1,r]
+    [X3]                                //[1e18,x1,x1,r]
+    eq case2 jumpi                      //[1e18=x1,x1,r]
+    [X3]                                //[1e18,x1,x1,r]
+    swap1                              //[x1,1e18,x1,r]
+    sub      //[x1-1e18]                //[x1-1e18,x1,r]
+    0x02                               //[2,x1-1e18,x1,r]
+    swap1                             //[x1-1e18,2,x1,r]
+    sdiv     // [x1_new]               //[x1_new,x1,r]
+    dup1                               //[x1_new,x1_new,r]
+    0x02                             //[2,x1_new,x1_new,r]
+    mul                             //[2*x1_new,x1_new,r]
+    [X13]                           //[1e9,2*x1_new,x1_new,r]
+    swap1                           //[2*x1_new,1e9,x1_new,r]
+    sdiv                            //[2*x1_new/1e9,x1_new,r]
+    0x02                            //[2,2*x1_new/1e9,x1_new,r]
+    swap1                           //[2*x1_new/1e9,2,x1_new,r]
+    exp                             //[2**(2*x1_new/1E9),2,x1_new,r]
+    0x04                            //[4,2**(2*x1_new/1E9),2,x1_new,r]
+    swap1                           //[2**x1_new,4,2,x1_new,r]
+    sdiv                             //[2**x1_new/4,2,x1_new,r]
+    0x01                            //[1,2**x1_new/4,2,x1_new,r]
+    0x00                             //[0,1,2**x1_new/4,2,x1_new,r]
+    sub                            //[-1,2**x1_new/4,2,x1_new,r]
+    mul //[x2_new,x1_new]          //[x2_new,x1_new,r]
+    dup2                //[x1_new,x2_new,x1_new,r]
+    0x02                  //[2,x1_new,x2_new,x1_new,r]
+    mul                   //[2*x1_new,x2_new,x1_new,r]
+    [X11]                 //[1e12 , 2*x1_new,x2_new,x1_new,r]   
+    sdiv                  //[2*x1_new/1e12,x2_new,x1_new,r]
+    0x03                  //[3,2*x1_new/1e12,x2_new,x1_new,r]
+    swap1                   //[2*x1_new/1e12,3,x2_new,x1_new,r]
+    exp                  //[2**x1_new/1e12**3,x2_new,x1_new,r]
+    0x0c                 //[12,2**x1_new/1e12**3,x2_new,x1_new,r]
     swap1
     sdiv  //[x3_new,x2_new,x1_new,r]
     [PI_QUARTER] //[all terms,r]
