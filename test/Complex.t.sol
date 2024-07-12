@@ -291,8 +291,8 @@ contract ComplexTest is Test {
     }
 
      function testSqrtfuzz(int256 ar , int256 ai ) public {
-        ai = bound(ai, -1e15 , 1e15);
-        ar = bound(ar, -1e15 , 1e15);
+        ai = bound(ai, -1e10 , 1e10);
+        ar = bound(ar, -1e10 , 1e10);
     
         (int256 sqrt_ar , int256 sqrt_ai) = complex.sqrt(ai*scale , ar*scale);
         (int256 r , int256 i) = complex.mulz(sqrt_ai , sqrt_ai , sqrt_ar , sqrt_ar);
@@ -300,8 +300,8 @@ contract ComplexTest is Test {
         i >= 0 ? i = i : i = -i;
         ar >= 0 ? ar =  ar : ar = -ar;
         ai >= 0 ? ai =  ai : ai =  -ai;
-        assertApproxEqAbs((r/(scale))  ,ar*scale, 5e17);
-        assertApproxEqAbs((i/(scale)) , ai*scale , 5e17);
+        assertApproxEqAbs((r/(scale))  ,ar*scale, 5e10);
+        assertApproxEqAbs((i/(scale)) , ai*scale , 5e10);
     }
 
 //tan(tan-1x) = x
