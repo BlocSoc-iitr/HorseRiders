@@ -255,6 +255,7 @@ contract ComplexTest is Test {
     }
 
     function testCalc_RFuzz(int256 ar, int256 ai, int256 br, int256 bi, int256 k) public {
+     vm.assume(k != 0);
     ai = bound(ai, -1e9, 1e9);
     bi = bound(bi, -1e9, 1e9);
     ar = bound(ar, -1e9, 1e9);
@@ -264,7 +265,7 @@ contract ComplexTest is Test {
     //ar^2+ai^2 = magnitude(A)**2
     (int256 mag1r,) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // ar^2 + ai^2
     int256 R1 = (int256((complex.calcR(ai*scale, ar*scale)))**2); // magnitude(A)
-    assertApproxEqAbs(mag1r/scale, R1/scale, 5e17);
+    assertApproxEqAbs(mag1r/scale, R1/scale, 1e10);
 
    //mag(A) = mag(-A)
     mag1r = int256(complex.calcR(-ai*scale ,  ar*scale)**2);
@@ -280,7 +281,7 @@ contract ComplexTest is Test {
     R1 = (int256((complex.calcR((ai*scale), (ar*scale)))));
     int256 R2 = (int256(complex.calcR(bi*scale, br*scale))); // magnitude(B)
      R3 = (int256(complex.calcR((mag1i/scale) , (ir/scale))));
-    assertApproxEqAbs(R3 , (R1*R2)/scale, 5e17); 
+    assertApproxEqAbs(R3 , (R1*R2)/scale, 1e10); 
 
 
      //magnitude(A+B) <= magnitude(A) + magnitude(B)
