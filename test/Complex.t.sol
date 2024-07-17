@@ -330,6 +330,92 @@ contract ComplexTest is Test {
 
     }
 
+/*@dev testing using the following formula
+     ze^(itheta)/ze^(itheta2) = e^(i(theta-theta2))
+     z1*z2 = e^((i(theta-theta2)))
+     */
+
+    function testFromPolar_Fuzz(int256 r , int256 i , int256 i2) public {
+        r = bound(r , 1e18 , 1e23);
+        i = bound(i , 1e18 , 1e23);
+        i2 = bound(i , 1e18 , 1e23);
+
+        (int256 r1 , int256 i1) = complex.fromPolar(r , i);
+        (int256 mag1r ) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r , r , 5e17);
+
+        (r1 , i1) = complex.fromPolar(r , i);
+        (int256 r_1, int256 i_1) = complex.fromPolar(r , i2);
+         (int256 r3 , int256 i3) = complex.fromPolar(1*scale , i-i2);
+        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+
+        assertApproxEqAbs(i1 , i3 , 0);
+      
+        r = bound(r , 1e16 , 1e19);
+        i = bound(i , 1e16 , 1e19);
+        i2 = bound(i , 1e16 , 1e19);
+        (r1 , i1) = complex.fromPolar(r , i);
+        (mag1r ) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r , r , 1e15);
+
+        (r1 , i1) = complex.fromPolar(r , i);
+        ( r_1,  i_1) = complex.fromPolar(r , i2);
+         ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
+        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+
+        assertApproxEqAbs(i1 , i3 , 0);
+
+        r = bound(r , 1e11 , 1e15);
+        i = bound(i , 1e11 , 1e15);
+        i2 = bound(i , 1e11 , 1e15);
+
+        (r1 , i1) = complex.fromPolar(r , i);
+        (mag1r ) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r , r , 5e10);
+
+          (r1 , i1) = complex.fromPolar(r , i);
+        ( r_1,  i_1) = complex.fromPolar(r , i2);
+         ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
+        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+
+        assertApproxEqAbs(i1 , i3 , 0);
+
+        i = bound(i , -1e20 , -1e16);
+        i2 = bound(i , -1e20 , -1e16);
+
+        (r1 , i1) = complex.fromPolar(r , i);
+        (mag1r) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r , r , 1e15);
+
+        
+        (r1 , i1) = complex.fromPolar(r , i);
+        ( r_1,  i_1) = complex.fromPolar(r , i2);
+        ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
+        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+
+ 
+        assertApproxEqAbs(i1 , i3 , 0);
+ 
+     
+        i = bound(i , -1e15 , -1e11);
+        i2 = bound(i , -1e15 , -1e11);
+
+        (r1 , i1) = complex.fromPolar(r , i);
+        (mag1r ) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r , r , 5e10);
+
+          (r1 , i1) = complex.fromPolar(r , i);
+        ( r_1,  i_1) = complex.fromPolar(r , i2);
+         ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
+        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+
+      
+        assertApproxEqAbs(i1 , i3 , 0);
+
+
+     
+    }
+
 
 }
 
