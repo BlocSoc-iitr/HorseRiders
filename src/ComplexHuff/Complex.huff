@@ -344,17 +344,28 @@
    swap1                  // [x,y]
 }
 
-
 ///@notice e^(a+bi) calculation
-
+//@dev made EXP_Z more accurate and reduced the case of overflow of integers by making the exponent value stick to 18 decimals
 #define macro EXP_Z() = takes(2) returns(2) {
  //INPUT STACK => [Re(A),Im(A)]
-  [e]                  // [e,Re(A),Im(A)]
-  exp                  // [e**Re(A),Im(A)]
+  [e]                  // [e,Re(A),Im(A)]                            
+  0x12                 // [18,e,Re(A),Im(A)]                         
+  dup3                 // [Re(A),18,e,Re(A),Im(A)]                                  
+  mul                  // [18*Re(A),e,Re(A),Im(A)]
+  0x12                 // [18,18*Re(A),e,Re(A),Im(A)]
+  swap1            
+  sub                  // [18*Re(A)-18,e,Re(A),Im(A)]
+  swap2          // [Re(A),e,18*Re(A)-18,Im(A)]
+  swap1             //[e , Re(A), ...]
+  exp                  // [e**Re(A),18*Re(A) - 18 , Im(A)]
+  swap1                // [18*Re(A) - 18 , e**Re(A) , Im(A)]
+  0x0a                // [10,18*Re(A) - 18 , e**Re(A) , Im(A)]
+  exp                 // [10**(18*Re(A) - 18) , e**Re(A) , Im(A)]
+  swap1               // [e**Re(A) , 10**(18*Re(A) - 18) , Im(A)]
+  sdiv               // [e**Re(A) / 10**(18*Re(A) - 18) , Im(A)]
   swap1
   FROM_POLAR()
 }
-
 ///@notice power of complex numbers
 
 #define macro POW() = takes(3) returns(2) {
