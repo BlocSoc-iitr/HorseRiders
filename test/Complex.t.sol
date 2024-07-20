@@ -416,6 +416,39 @@ contract ComplexTest is Test {
      
     }
 
+  function testExpZ_Fuzz(int256 r , int256 i) public {
+    r = bound(r , 1, 1e2);
+    i = bound(i , 1e16 , 1e18);
+
+   //periodicity check
+    (int256 r1 , int256 i1) = complex.expZ(i , r);
+    (int256 r_1 ,int256 i_1) = complex.expZ(i + int256(2*pi) , r);
+    assertApproxEqAbs(r1 , r_1 , 0);
+    assertApproxEqAbs(i1 , i_1 , 0);
+    
+    //conjugateof(e^z) = e^conjugateof(z)
+    ( r1 , i1) = complex.expZ(i , r);
+    (r_1 , i_1) = complex.expZ(-i , r);
+    assertApproxEqAbs(r1 , r_1 , 1e15);
+    assertApproxEqAbs(-i1 , i_1 , 1e15);
+    
+    r = bound(r , 1, 1e2);
+    i = bound(i , 1e12 , 1e15);
+    
+    //periodicity check
+    ( r1 ,  i1) = complex.expZ(i , r);
+    ( r_1 , i_1) = complex.expZ(i + int256(2*pi) , r);
+    assertApproxEqAbs(r1 , r_1 , 0);
+    assertApproxEqAbs(i1 , i_1 , 0);
+    
+    //conjugateof(e^z) = e^conjugateof(z)
+    ( r1 , i1) = complex.expZ(i , r);
+    (r_1 , i_1) = complex.expZ(-i , r);
+    assertApproxEqAbs(r1 , r_1 , 1e11);
+    assertApproxEqAbs(-i1 , i_1 , 1e11);
+    
+    }d
+
 
 }
 
