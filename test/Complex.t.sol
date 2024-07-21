@@ -11,7 +11,7 @@ contract ComplexTest is Test {
     WRAPPER public complex;
     int256 scale = 1e18;
     int256 scale2 = 1e19;
-
+    uint256 constant pi = 3141592653589793238;
     function setUp() public {
         complex = WRAPPER(HuffDeployer.deploy("ComplexHuff/WRAPPER"));
     }
@@ -447,7 +447,7 @@ contract ComplexTest is Test {
     assertApproxEqAbs(r1 , r_1 , 1e11);
     assertApproxEqAbs(-i1 , i_1 , 1e11);
     
-    }d
+    }
 
 
 }
