@@ -11,6 +11,7 @@ contract ComplexTest is Test {
     WRAPPER public complex;
     int256 scale = 1e18;
     int256 scale2 = 1e19;
+    uint256 constant pi = 3141592653589793238;
 
     function setUp() public {
         complex = WRAPPER(HuffDeployer.deploy("ComplexHuff/WRAPPER"));
@@ -255,201 +256,186 @@ contract ComplexTest is Test {
     }
 
     function testCalc_RFuzz(int256 ar, int256 ai, int256 br, int256 bi, int256 k) public {
-     vm.assume(k != 0);
-    ai = bound(ai, -1e9, 1e9);
-    bi = bound(bi, -1e9, 1e9);
-    ar = bound(ar, -1e9, 1e9);
-    br = bound(br, -1e9, 1e9);
-    k = bound(k, -1e8 , 1e8);
+        vm.assume(k != 0);
+        ai = bound(ai, -1e9, 1e9);
+        bi = bound(bi, -1e9, 1e9);
+        ar = bound(ar, -1e9, 1e9);
+        br = bound(br, -1e9, 1e9);
+        k = bound(k, -1e8, 1e8);
 
-    //ar^2+ai^2 = magnitude(A)**2
-    (int256 mag1r,) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // ar^2 + ai^2
-    int256 R1 = (int256((complex.calcR(ai*scale, ar*scale)))**2); // magnitude(A)
-    assertApproxEqAbs(mag1r/scale, R1/scale, 1e10);
+        //ar^2+ai^2 = magnitude(A)**2
+        (int256 mag1r,) = (complex.mulz(-ai * scale, ai * scale, ar * scale, ar * scale)); // ar^2 + ai^2
+        int256 R1 = (int256((complex.calcR(ai * scale, ar * scale))) ** 2); // magnitude(A)
+        assertApproxEqAbs(mag1r / scale, R1 / scale, 1e10);
 
-   //mag(A) = mag(-A)
-    mag1r = int256(complex.calcR(-ai*scale ,  ar*scale)**2);
-    assertEq(mag1r/scale, R1/scale);
+        //mag(A) = mag(-A)
+        mag1r = int256(complex.calcR(-ai * scale, ar * scale) ** 2);
+        assertEq(mag1r / scale, R1 / scale);
 
-   //(mag(a))**2 = (k*mag(A))**2
-    (mag1r , ) = (complex.mulz(-ai*scale, ai*scale, ar*scale, ar*scale)); // kA
-     int256 R3 = (int256(complex.calcR((k*ai)*scale, (k*ar)*scale))**2); // magnitude(A)
-    assertApproxEqAbs(((k**2)*(mag1r/scale)), R3/scale, 5e17);
+        //(mag(a))**2 = (k*mag(A))**2
+        (mag1r,) = (complex.mulz(-ai * scale, ai * scale, ar * scale, ar * scale)); // kA
+        int256 R3 = (int256(complex.calcR((k * ai) * scale, (k * ar) * scale)) ** 2); // magnitude(A)
+        assertApproxEqAbs(((k ** 2) * (mag1r / scale)), R3 / scale, 5e17);
 
-   //mag(z1z2) = mag(z1)*mag(z2)
-    (int256 ir , int256 mag1i) = complex.mulz(bi*scale, ai*scale, br*scale, ar*scale);
-    R1 = (int256((complex.calcR((ai*scale), (ar*scale)))));
-    int256 R2 = (int256(complex.calcR(bi*scale, br*scale))); // magnitude(B)
-     R3 = (int256(complex.calcR((mag1i/scale) , (ir/scale))));
-    assertApproxEqAbs(R3 , (R1*R2)/scale, 1e10); 
+        //mag(z1z2) = mag(z1)*mag(z2)
+        (int256 ir, int256 mag1i) = complex.mulz(bi * scale, ai * scale, br * scale, ar * scale);
+        R1 = (int256((complex.calcR((ai * scale), (ar * scale)))));
+        int256 R2 = (int256(complex.calcR(bi * scale, br * scale))); // magnitude(B)
+        R3 = (int256(complex.calcR((mag1i / scale), (ir / scale))));
+        assertApproxEqAbs(R3, (R1 * R2) / scale, 1e10);
 
-
-     //magnitude(A+B) <= magnitude(A) + magnitude(B)
-    R3  = (int256(complex.calcR((bi+ai)*scale , (br + ar)*scale)));
-    assert (R1 + R2 >= R3);
-
+        //magnitude(A+B) <= magnitude(A) + magnitude(B)
+        R3 = (int256(complex.calcR((bi + ai) * scale, (br + ar) * scale)));
+        assert(R1 + R2 >= R3);
     }
 
-     function testSqrtfuzz(int256 ar , int256 ai ) public {
-        ai = bound(ai, -1e10 , 1e10);
-        ar = bound(ar, -1e10 , 1e10);
-    
-        (int256 sqrt_ar , int256 sqrt_ai) = complex.sqrt(ai*scale , ar*scale);
-        (int256 r , int256 i) = complex.mulz(sqrt_ai , sqrt_ai , sqrt_ar , sqrt_ar);
+    function testSqrtfuzz(int256 ar, int256 ai) public {
+        ai = bound(ai, -1e10, 1e10);
+        ar = bound(ar, -1e10, 1e10);
+
+        (int256 sqrt_ar, int256 sqrt_ai) = complex.sqrt(ai * scale, ar * scale);
+        (int256 r, int256 i) = complex.mulz(sqrt_ai, sqrt_ai, sqrt_ar, sqrt_ar);
         r >= 0 ? r = r : r = -r;
         i >= 0 ? i = i : i = -i;
-        ar >= 0 ? ar =  ar : ar = -ar;
-        ai >= 0 ? ai =  ai : ai =  -ai;
-        assertApproxEqAbs((r/(scale))  ,ar*scale, 5e10);
-        assertApproxEqAbs((i/(scale)) , ai*scale , 5e10);
+        ar >= 0 ? ar = ar : ar = -ar;
+        ai >= 0 ? ai = ai : ai = -ai;
+        assertApproxEqAbs((r / (scale)), ar * scale, 5e10);
+        assertApproxEqAbs((i / (scale)), ai * scale, 5e10);
     }
 
-//tan(tan-1x) = x
+    //tan(tan-1x) = x
 
- function testAtan1to1Fuzz(int256 ar, int256 br) public {
+    function testAtan1to1Fuzz(int256 ar, int256 br) public {
         ar = bound(ar, 1e16, 1e18);
         br = bound(br, 1e16, 1e18);
 
         int256 r = complex.atan1to1(ar);
-       assert(-157*1e16 <= r && r <= 157*1e16);
+        assert(-157 * 1e16 <= r && r <= 157 * 1e16);
 
-        int256 r1 = (Trigonometry.sin(uint256(r))*1e18)/Trigonometry.cos(uint256(r)) ;
-        assertApproxEqAbs(ar , r1 , 5e15);
+        int256 r1 = (Trigonometry.sin(uint256(r)) * 1e18) / Trigonometry.cos(uint256(r));
+        assertApproxEqAbs(ar, r1, 5e15);
 
-        ar = bound(ar , 1e15 , 1e16);
-         r = complex.atan1to1(ar);
-         r1 = (Trigonometry.sin(uint256(r))*1e18)/Trigonometry.cos(uint256(r)) ;
-        assertApproxEqAbs(ar , r1 , 5e14);
+        ar = bound(ar, 1e15, 1e16);
+        r = complex.atan1to1(ar);
+        r1 = (Trigonometry.sin(uint256(r)) * 1e18) / Trigonometry.cos(uint256(r));
+        assertApproxEqAbs(ar, r1, 5e14);
 
-        ar = bound(ar , 1e14, 1e15);
-         r = complex.atan1to1(ar);
-         r1 = (Trigonometry.sin(uint256(r))*1e18)/Trigonometry.cos(uint256(r)) ;
-        assertApproxEqAbs(ar , r1 , 5e13);
-
-
-
+        ar = bound(ar, 1e14, 1e15);
+        r = complex.atan1to1(ar);
+        r1 = (Trigonometry.sin(uint256(r)) * 1e18) / Trigonometry.cos(uint256(r));
+        assertApproxEqAbs(ar, r1, 5e13);
     }
 
-/*@dev testing using the following formula
+    /*@dev testing using the following formula
      ze^(itheta)/ze^(itheta2) = e^(i(theta-theta2))
      z1*z2 = e^((i(theta-theta2)))
      */
 
-    function testFromPolar_Fuzz(int256 r , int256 i , int256 i2) public {
-        r = bound(r , 1e18 , 1e23);
-        i = bound(i , 1e18 , 1e23);
-        i2 = bound(i , 1e18 , 1e23);
+    function testFromPolar_Fuzz(int256 r, int256 i, int256 i2) public {
+        r = bound(r, 1e18, 1e23);
+        i = bound(i, 1e18, 1e23);
+        i2 = bound(i, 1e18, 1e23);
 
-        (int256 r1 , int256 i1) = complex.fromPolar(r , i);
-        (int256 mag1r ) = int256(complex.calcR(((r1)), ((i1))));
-        assertApproxEqAbs(mag1r , r , 5e17);
+        (int256 r1, int256 i1) = complex.fromPolar(r, i);
+        (int256 mag1r) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r, r, 5e17);
 
-        (r1 , i1) = complex.fromPolar(r , i);
-        (int256 r_1, int256 i_1) = complex.fromPolar(r , i2);
-         (int256 r3 , int256 i3) = complex.fromPolar(1*scale , i-i2);
-        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+        (r1, i1) = complex.fromPolar(r, i);
+        (int256 r_1, int256 i_1) = complex.fromPolar(r, i2);
+        (int256 r3, int256 i3) = complex.fromPolar(1 * scale, i - i2);
+        (r1, i1) = (complex.divz(i_1, i1, r_1, r1));
 
-        assertApproxEqAbs(i1 , i3 , 0);
-      
-        r = bound(r , 1e16 , 1e19);
-        i = bound(i , 1e16 , 1e19);
-        i2 = bound(i , 1e16 , 1e19);
-        (r1 , i1) = complex.fromPolar(r , i);
-        (mag1r ) = int256(complex.calcR(((r1)), ((i1))));
-        assertApproxEqAbs(mag1r , r , 1e15);
+        assertApproxEqAbs(i1, i3, 0);
 
-        (r1 , i1) = complex.fromPolar(r , i);
-        ( r_1,  i_1) = complex.fromPolar(r , i2);
-         ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
-        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
-
-        assertApproxEqAbs(i1 , i3 , 0);
-
-        r = bound(r , 1e11 , 1e15);
-        i = bound(i , 1e11 , 1e15);
-        i2 = bound(i , 1e11 , 1e15);
-
-        (r1 , i1) = complex.fromPolar(r , i);
-        (mag1r ) = int256(complex.calcR(((r1)), ((i1))));
-        assertApproxEqAbs(mag1r , r , 5e10);
-
-          (r1 , i1) = complex.fromPolar(r , i);
-        ( r_1,  i_1) = complex.fromPolar(r , i2);
-         ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
-        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
-
-        assertApproxEqAbs(i1 , i3 , 0);
-
-        i = bound(i , -1e20 , -1e16);
-        i2 = bound(i , -1e20 , -1e16);
-
-        (r1 , i1) = complex.fromPolar(r , i);
+        r = bound(r, 1e16, 1e19);
+        i = bound(i, 1e16, 1e19);
+        i2 = bound(i, 1e16, 1e19);
+        (r1, i1) = complex.fromPolar(r, i);
         (mag1r) = int256(complex.calcR(((r1)), ((i1))));
-        assertApproxEqAbs(mag1r , r , 1e15);
+        assertApproxEqAbs(mag1r, r, 1e15);
 
-        
-        (r1 , i1) = complex.fromPolar(r , i);
-        ( r_1,  i_1) = complex.fromPolar(r , i2);
-        ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
-        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+        (r1, i1) = complex.fromPolar(r, i);
+        (r_1, i_1) = complex.fromPolar(r, i2);
+        (r3, i3) = complex.fromPolar(1 * scale, i - i2);
+        (r1, i1) = (complex.divz(i_1, i1, r_1, r1));
 
- 
-        assertApproxEqAbs(i1 , i3 , 0);
- 
-     
-        i = bound(i , -1e15 , -1e11);
-        i2 = bound(i , -1e15 , -1e11);
+        assertApproxEqAbs(i1, i3, 0);
 
-        (r1 , i1) = complex.fromPolar(r , i);
-        (mag1r ) = int256(complex.calcR(((r1)), ((i1))));
-        assertApproxEqAbs(mag1r , r , 5e10);
+        r = bound(r, 1e11, 1e15);
+        i = bound(i, 1e11, 1e15);
+        i2 = bound(i, 1e11, 1e15);
 
-          (r1 , i1) = complex.fromPolar(r , i);
-        ( r_1,  i_1) = complex.fromPolar(r , i2);
-         ( r3 ,  i3) = complex.fromPolar(1*scale , i-i2);
-        (r1 , i1) = (complex.divz(i_1,i1, r_1 , r1));
+        (r1, i1) = complex.fromPolar(r, i);
+        (mag1r) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r, r, 5e10);
 
-      
-        assertApproxEqAbs(i1 , i3 , 0);
+        (r1, i1) = complex.fromPolar(r, i);
+        (r_1, i_1) = complex.fromPolar(r, i2);
+        (r3, i3) = complex.fromPolar(1 * scale, i - i2);
+        (r1, i1) = (complex.divz(i_1, i1, r_1, r1));
 
+        assertApproxEqAbs(i1, i3, 0);
 
-     
+        i = bound(i, -1e20, -1e16);
+        i2 = bound(i, -1e20, -1e16);
+
+        (r1, i1) = complex.fromPolar(r, i);
+        (mag1r) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r, r, 1e15);
+
+        (r1, i1) = complex.fromPolar(r, i);
+        (r_1, i_1) = complex.fromPolar(r, i2);
+        (r3, i3) = complex.fromPolar(1 * scale, i - i2);
+        (r1, i1) = (complex.divz(i_1, i1, r_1, r1));
+
+        assertApproxEqAbs(i1, i3, 0);
+
+        i = bound(i, -1e15, -1e11);
+        i2 = bound(i, -1e15, -1e11);
+
+        (r1, i1) = complex.fromPolar(r, i);
+        (mag1r) = int256(complex.calcR(((r1)), ((i1))));
+        assertApproxEqAbs(mag1r, r, 5e10);
+
+        (r1, i1) = complex.fromPolar(r, i);
+        (r_1, i_1) = complex.fromPolar(r, i2);
+        (r3, i3) = complex.fromPolar(1 * scale, i - i2);
+        (r1, i1) = (complex.divz(i_1, i1, r_1, r1));
+
+        assertApproxEqAbs(i1, i3, 0);
     }
 
-  function testExpZ_Fuzz(int256 r , int256 i) public {
-    r = bound(r , 1, 1e2);
-    i = bound(i , 1e16 , 1e18);
+    function testExpZ_Fuzz(int256 r, int256 i) public {
+        r = bound(r, 1, 1e2);
+        i = bound(i, 1e16, 1e18);
 
-   //periodicity check
-    (int256 r1 , int256 i1) = complex.expZ(i , r);
-    (int256 r_1 ,int256 i_1) = complex.expZ(i + int256(2*pi) , r);
-    assertApproxEqAbs(r1 , r_1 , 0);
-    assertApproxEqAbs(i1 , i_1 , 0);
-    
-    //conjugateof(e^z) = e^conjugateof(z)
-    ( r1 , i1) = complex.expZ(i , r);
-    (r_1 , i_1) = complex.expZ(-i , r);
-    assertApproxEqAbs(r1 , r_1 , 1e15);
-    assertApproxEqAbs(-i1 , i_1 , 1e15);
-    
-    r = bound(r , 1, 1e2);
-    i = bound(i , 1e12 , 1e15);
-    
-    //periodicity check
-    ( r1 ,  i1) = complex.expZ(i , r);
-    ( r_1 , i_1) = complex.expZ(i + int256(2*pi) , r);
-    assertApproxEqAbs(r1 , r_1 , 0);
-    assertApproxEqAbs(i1 , i_1 , 0);
-    
-    //conjugateof(e^z) = e^conjugateof(z)
-    ( r1 , i1) = complex.expZ(i , r);
-    (r_1 , i_1) = complex.expZ(-i , r);
-    assertApproxEqAbs(r1 , r_1 , 1e11);
-    assertApproxEqAbs(-i1 , i_1 , 1e11);
-    
-    }d
+        //periodicity check
+        (int256 r1, int256 i1) = complex.expZ(i, r);
+        (int256 r_1, int256 i_1) = complex.expZ(i + int256(2 * pi), r);
+        assertApproxEqAbs(r1, r_1, 0);
+        assertApproxEqAbs(i1, i_1, 0);
 
+        //conjugateof(e^z) = e^conjugateof(z)
+        (r1, i1) = complex.expZ(i, r);
+        (r_1, i_1) = complex.expZ(-i, r);
+        assertApproxEqAbs(r1, r_1, 1e15);
+        assertApproxEqAbs(-i1, i_1, 1e15);
 
+        r = bound(r, 1, 1e2);
+        i = bound(i, 1e12, 1e15);
+
+        //periodicity check
+        (r1, i1) = complex.expZ(i, r);
+        (r_1, i_1) = complex.expZ(i + int256(2 * pi), r);
+        assertApproxEqAbs(r1, r_1, 0);
+        assertApproxEqAbs(i1, i_1, 0);
+
+        //conjugateof(e^z) = e^conjugateof(z)
+        (r1, i1) = complex.expZ(i, r);
+        (r_1, i_1) = complex.expZ(-i, r);
+        assertApproxEqAbs(r1, r_1, 1e11);
+        assertApproxEqAbs(-i1, i_1, 1e11);
+    }
 }
 
 interface WRAPPER {
