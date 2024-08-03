@@ -14,10 +14,13 @@ contract PRBMathtest is Test {
         prb_huff = Wrapper(HuffDeployer.deploy("ComplexHuff/PRBMathWrapper"));
     }
 
-    // function test_sqrt(int256 num) public {
-    //     vm.assume(num > 0);
-    //     assertApproxEqAbs(PRBMathSD59x18.log2(num), prb_huff.log_2(num), 0);
-    // }
+    function test_sqrt(int256 num) public {
+        num = bound(num, 1, 1e38);
+        int256 res = num ** 2;
+        res = prb_huff.sqrt(res);
+        assertEq(res, num);
+        assertApproxEqAbs(PRBMathSD59x18.sqrt(num) / 1e9, prb_huff.sqrt(num), 0);
+    }
 
     function testFuzz_ln(int256 num) public {
         vm.assume(num > 0);
